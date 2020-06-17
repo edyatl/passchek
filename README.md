@@ -2,11 +2,13 @@
 
 
 # Passchek
----
+
 
 > Passchek is a simple cli tool, checks if your password has been compromised.
 
-[![Version](https://img.shields.io/badge/version-v0.2-blue)](https://github.com)
+[![Version: v0.2](https://img.shields.io/badge/version-v0.2-blue)](https://github.com/edyatl/passchek)
+[![Version: v0.2](https://img.shields.io/badge/license-MIT-green)](https://github.com/edyatl/passchek/LICENSE)
+[![Python3](https://img.shields.io/badge/python-3.5%20%7C%203.6%20%7C%203.7-blue)](https://github.com/edyatl/passchek)
 
 Passchek is a python program for searching in [Troy Hunt's pwnedpassword](https://www.troyhunt.com/ive-just-launched-pwned-passwords-version-2/) API using the k-anonymity algorithm. 
 
@@ -14,7 +16,7 @@ Passchek was inspired by [jamesridgway](https://github.com/jamesridgway)/[pwnedp
 
 
 ## Algorithm
----
+
 
 1. Hash the PASSWORD by SHA1.
 2. Split hash for 5 char prefix and 35 char suffix.
@@ -24,7 +26,7 @@ Passchek was inspired by [jamesridgway](https://github.com/jamesridgway)/[pwnedp
 
 
 ## Features
----
+
 
 - Checks one password or number of passwords.
 - Shows a text sentence about  compromising or just figures.
@@ -33,7 +35,7 @@ Passchek was inspired by [jamesridgway](https://github.com/jamesridgway)/[pwnedp
 
 
 ## Usage
----
+
 
 ```sh
     Usage:
@@ -56,7 +58,7 @@ Please note that in case of using PASSWORD as command line argument it will be k
 
 
 ## Usage examples
----
+
 
 A) Call **passchek** without options and arguments, enter 'qwerty' as an example password. *Please note that when you are typing password via explicit prompt, nothing is displayed on the screen, this is normal and is used for security reasons.* After press Enter key you'll see a sentence in new line with number of matches in the pwnedpassword DB.
 
@@ -150,7 +152,7 @@ So no more weak passwords detected.
 
 
 ## Installation
----
+
 You can simple download one script file [passchek.py](./passchek/passchek.py) and use it with python3.
 
 Or try to install by pip.
@@ -168,7 +170,7 @@ Install if package exists:
 
 
 ## Help
----
+
 
 For help screen just provide `-h` or `--help` as a command line option.
 
@@ -176,7 +178,7 @@ Option `-v` or `--version` shows current version.
 
 
 ## Contributing
----
+
 
 The main repository if the code is at https://github.com/edyatl/passchek
 
@@ -184,7 +186,7 @@ I'm happy to take from you any patches, pull requests,  bug reports,  ideas abou
 
 
 ## Thanks
----
+
 
 Thanks to [Troy Hunt](https://www.troyhunt.com) for collecting data and providing API.
 
@@ -192,13 +194,13 @@ Thanks to [James Ridgway](https://github.com/jamesridgway) for [pwnedpasswords.s
 
 
 ## Authors
----
+
 
 Yevgeny Dyatlov ([@edyatl](https://github.com/edyatl))
 
 
 ## License
----
+
 
 This project is licensed under the MIT License.
 
