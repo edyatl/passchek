@@ -7,7 +7,7 @@
 
 # custom
 .cache
-
+*.css
 *.py[cod]
 
 # C extensions

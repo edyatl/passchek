@@ -9,7 +9,7 @@ import getopt
 #from prompt_toolkit import prompt
 
 
-__version__ = '0.2'
+__version__ = '0.2.1'
 
 
 def usage():
@@ -95,7 +95,7 @@ def convert_key_val_tpl(line):
     return hash, int(count)
 
 
-def main(passwrd=None):
+def get_matches(passwrd=None):
     """Get matches from pwnedpassword DB and show on screen
 
     :param passwrd: password in raw format
@@ -121,9 +121,10 @@ def main(passwrd=None):
     else:
         print(not_matches_txt)
 
-    
-if __name__ == '__main__':
+
+def main():
     # Default flag for --num-only option
+    global text_output
     text_output = True
     # Default flag for --pipe option
     use_in_pipe = False
@@ -181,13 +182,17 @@ if __name__ == '__main__':
                 passwrd = sys.argv[1]
         else:
             for _arg in args:
-                main(_arg)
+                get_matches(_arg)
             if args:
                 sys.exit()
             if use_in_pipe:
                 for pass_line in sys.stdin.readlines():
-                    main(pass_line.strip())
+                    get_matches(pass_line.strip())
             else:
-                main()
+                get_matches()
     else:
-        main()
+        get_matches()
+
+
+if __name__ == '__main__':
+    main()

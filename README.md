@@ -6,8 +6,8 @@
 
 > Passchek is a simple cli tool, checks if your password has been compromised.
 
-[![Version: v0.2](https://img.shields.io/badge/version-v0.2-blue)](https://github.com/edyatl/passchek)
-[![Version: v0.2](https://img.shields.io/badge/license-MIT-green)](https://github.com/edyatl/passchek/LICENSE)
+[![Version: v0.2](https://img.shields.io/badge/version-v0.2.1-blue)](https://github.com/edyatl/passchek)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/edyatl/passchek/LICENSE)
 [![Python3](https://img.shields.io/badge/python-3.5%20%7C%203.6%20%7C%203.7-blue)](https://github.com/edyatl/passchek)
 
 Passchek is a python program for searching in [Troy Hunt's pwnedpassword](https://www.troyhunt.com/ive-just-launched-pwned-passwords-version-2/) API using the k-anonymity algorithm. 
@@ -48,7 +48,7 @@ Passchek was inspired by [jamesridgway](https://github.com/jamesridgway)/[pwnedp
         -h, --help      Shows this help message and exit
         -n, --num-only  Set output without accompanying text
         -p, --pipe      For use in shell pipes, read stdin
-        -s, --sha1      Shows SHA1 hash in tuple ('prefix', 'suffix') and exit
+        -s, --sha1      Shows SHA1 hash in tuple ("prefix", "suffix") and exit
         -v, --version   Shows current version of the program and exit
 ```
 
@@ -140,7 +140,6 @@ I) To determine these three weak passwords we need to know their line numbers in
     2:8
     9:457
 ```
-So three passwords in our list have been compromised.
 
 J) Now we can get a list of strong passwords just delete lines with compromised.
 
@@ -166,6 +165,10 @@ Install if package exists:
 
 ```sh
     $ python3 -m pip install --user passchek
+```
+Or just:
+```sh
+    $ pip3 install passchek
 ```
 
 
