@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="
+		Main usage screen
+		"> 
+    
+	<meta name="author" content=" @edyatl ">  
+    <base href="https://passchek.github.com/">
+    <title>Usage</title>
+
+    
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    
+    <link href="css/landing-page.css" rel="stylesheet">
+
+    
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    
+    <link href="css/bootstrap-social.css" rel="stylesheet">
+
+    
+    
+    
+
+    <style>
+    .navbar {
+    border-color: #e7e7e7;
+}
+
+.content-section-a,
+footer,
+.navbar {
+  background-color: #f8f8f8;
+  color: #333;
+}
+
+.navbar a:link,
+.navbar-default .navbar-nav>li>a {
+  color: #777;
+}
+
+.navbar a:hover,
+.navbar-default .navbar-nav>li>a:hover {
+  color: rgb(51, 51, 51);
+}
+
+.content-section-b {
+  background-color: white;
+  color: #333;
+}
+
+body {
+  color: rgb(51, 51, 51);
+}
+
+.header-container h1,
+.header-container h2,
+.header-container h3,
+.header-container h4 {
+  color: rgb(51, 51, 51);
+}
+ 
+  </style>
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+<meta name="msapplication-TileColor" content="#da532c">
+<meta name="theme-color" content="#ffffff">
+</head>
+<body>
+
+
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        
+        <div class="navbar-header page-scroll" style="margin-left: -15px;">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" style="margin-right: 0px;">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand page-scroll" style="padding-left: 0px;margin-left: 0px;" href="#intro">
+            Passchek</a>
+        </div>
+        
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+				
+				<li>
+				  <a class="page-scroll" href="https://github.com/edyatl/passchek">
+                    Github
+                  </a>
+                </li>
+				 
+				
+				<li>
+					<a class="page-scroll" href="https://github.com/edyatl">
+                    @edyatl
+					</a>
+                </li>
+				 
+            </ul>
+        </div>
+        
+    </div>
+    
+</nav>
+
+
+<section id="services">
+   <div class="content-section-a">
+
+      <div class="container">
+
+        <div class="row">
+          <div>
+            <hr class="section-heading-spacer">
+            <div class="clearfix"></div>
+            <h2 class="section-heading">Usage</h2>
+            <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">    Usage:
+        passchek.py <span style="color:#f92672">[</span>options<span style="color:#f92672">]</span> <span style="color:#f92672">[</span>&lt;PASSWORD&gt;<span style="color:#f92672">]</span>
+
+    Arguments:
+        PASSWORD Provide <span style="color:#f92672">(</span>password | passwords<span style="color:#f92672">)</span> as argument or leave blank to provide via stdin or prompt
+
+    Options:
+        -h, --help      Shows this help message and exit
+        -n, --num-only  Set output without accompanying text
+        -p, --pipe      For use in shell pipes, read stdin
+        -s, --sha1      Shows SHA1 hash in tuple <span style="color:#f92672">(</span><span style="color:#e6db74">&#34;prefix&#34;</span>, <span style="color:#e6db74">&#34;suffix&#34;</span><span style="color:#f92672">)</span> and exit
+        -v, --version   Shows current version of the program and exit
+</code></pre></div><h3 id="security-note">Security Note</h3>
+<p>Please note that in case of using PASSWORD as command line argument it will be kept in .bash_history file in raw insecure format. Using via explicit prompt dialog is more secure and preferably.</p>
+<h2 id="usage-examples">Usage examples</h2>
+<p>A) Call <strong>passchek</strong> without options and arguments, enter &lsquo;qwerty&rsquo; as an example password. <em>Please note that when you are typing password via explicit prompt, nothing is displayed on the screen, this is normal and is used for security reasons.</em> After press Enter key you&rsquo;ll see a sentence in new line with number of matches in the pwnedpassword DB.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">    $ python3 passchek.py 
+    Enter password: 
+    This password has appeared <span style="color:#ae81ff">3912816</span> times in data breaches.
+</code></pre></div><p>B) Call <strong>passchek</strong> with option &lsquo;-n&rsquo; (&ndash;num-only) without arguments, enter &lsquo;qwerty&rsquo; as an example password. After press Enter key you&rsquo;ll see a number in new line with matches in the pwnedpassword DB.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">    $ python3 passchek.py -n 
+    Enter password: 
+    <span style="color:#ae81ff">3912816</span>
+</code></pre></div><p>C) Call <strong>passchek</strong> with option &lsquo;-s&rsquo; (&ndash;sha1) without arguments, enter &lsquo;qwerty&rsquo; as an example password. After press Enter key you&rsquo;ll see new line with the password hash in a tuple format (“prefix”, “suffix”).</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">    $ python3 passchek.py -s
+    Enter password: 
+    <span style="color:#f92672">(</span><span style="color:#e6db74">&#39;B1B37&#39;</span>, <span style="color:#e6db74">&#39;73A05C0ED0176787A4F1574FF0075F7521E&#39;</span><span style="color:#f92672">)</span>
+</code></pre></div><p>D) Call <strong>passchek</strong> with options &lsquo;-ns&rsquo; (&ndash;num-only &ndash;sha1) without arguments, enter &lsquo;qwerty&rsquo; as an example password. After press Enter key you&rsquo;ll see new line with the password hash splited by space &lsquo;prefix suffix&rsquo;.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">    $ python3 passchek.py -ns
+    Enter password: 
+    B1B37 73A05C0ED0176787A4F1574FF0075F7521E
+</code></pre></div><p>E) Call <strong>passchek</strong> without options and with argument &lsquo;qwerty&rsquo; as an example password. You&rsquo;ll see a sentence in new line with number of matches in the pwnedpassword DB. <em>Please note that using real password as an argument not recommended, for more details see <a href="#security-note">Security Note</a>.</em></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">    $ python3 passchek.py qwerty
+    This password has appeared <span style="color:#ae81ff">3912816</span> times in data breaches.
+</code></pre></div><p>F) Call <strong>passchek</strong> with option &lsquo;-n&rsquo; (&ndash;num-only) and with arguments &lsquo;qwerty&rsquo;, &lsquo;ytrewq&rsquo;, &lsquo;qazwsx&rsquo; <em>(these three are very common weak passwords)</em> and &lsquo;jnfjdfksdjfbskjdeuhiseg&rsquo; <em>(random typing)</em> as examples passwords. You&rsquo;ll see numbers in new lines with matches in the pwnedpassword DB. <em>Please don&rsquo;t forget about <a href="#security-note">Security Note</a>.</em></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">    $ python3 passchek.py -n qwerty ytrewq qazwsx jnfjdfksdjfbskjdeuhiseg
+    <span style="color:#ae81ff">3912816</span>
+    <span style="color:#ae81ff">33338</span>
+    <span style="color:#ae81ff">505344</span>
+    <span style="color:#ae81ff">0</span>
+</code></pre></div><p>G) Use <strong>passchek</strong> with options &lsquo;-np&rsquo; (&ndash;num-only &ndash;pipe) in pipe with <code>cat pass_list.txt</code> to check all passwords in text file (In this example text file was created as <code>ls .. &gt; pass_list.txt</code> in the script dir). You&rsquo;ll see numbers in new lines with matches in the pwnedpassword DB.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">    $ cat pass_list.txt | python3 passchek.py -np
+    <span style="color:#ae81ff">21</span>
+    <span style="color:#ae81ff">8</span>
+    <span style="color:#ae81ff">0</span>
+    <span style="color:#ae81ff">0</span>
+    <span style="color:#ae81ff">0</span>
+    <span style="color:#ae81ff">0</span>
+    <span style="color:#ae81ff">0</span>
+    <span style="color:#ae81ff">0</span>
+    <span style="color:#ae81ff">457</span>
+</code></pre></div><p>H) Let&rsquo;s count a number of compromised passwords in the previous example &lsquo;G&rsquo;.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">    $ cat pass_list.txt | python3 passchek.py -np | grep -v <span style="color:#e6db74">&#39;^0&#39;</span> | wc -l
+    <span style="color:#ae81ff">3</span>
+</code></pre></div><p>So three passwords in our list have been compromised.</p>
+<p>I) To determine these three weak passwords we need to know their line numbers in the text file.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">    $ cat pass_list.txt | python3 passchek.py -np | grep -vn <span style="color:#e6db74">&#39;^0&#39;</span>
+    1:21
+    2:8
+    9:457
+</code></pre></div><p>J) Now we can get a list of strong passwords just delete lines with compromised.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-sh" data-lang="sh">    $ sed -i <span style="color:#e6db74">&#39;1d;2d;9d;&#39;</span> pass_list.txt | python3 passchek.py -np | grep -v <span style="color:#e6db74">&#39;^0&#39;</span> | wc -l
+    <span style="color:#ae81ff">0</span>
+</code></pre></div><p>So no more weak passwords detected.</p>
+
+        </div>
+    </div>
+
+</div>
+</div>
+
+</section>
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8" style="padding-left: 0px; width:100%">
+				<ul class="list-inline">
+					<li>
+						<a class="page-scroll" href="#intro">Up</a>
+					</li>
+					
+					
+				 </ul>
+				 <p class="copyright text-muted small" style="text-align:left;">
+                    Copyright &copy; 2020 @edyatl All Rights Reserved 
+                 </p>
+			</div>
+            
+        </div>
+    </div>
+</footer>
+
+<script src="js/jquery-1.11.0.js"></script>
+
+
+<script src="js/jquery.easing.min.js"></script>
+
+
+<script src="js/bootstrap.min.js"></script>
+
+
+
+</body>
+</html>
+

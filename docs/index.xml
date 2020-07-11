@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Passchek</title>
+    <link>https://passchek.github.com/</link>
+    <description>Recent content on Passchek</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 09 Jul 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://passchek.github.com/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Algorithm</title>
+      <link>https://passchek.github.com/post/algorithm/</link>
+      <pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://passchek.github.com/post/algorithm/</guid>
+      <description> Hash the PASSWORD by SHA1. Split hash for 5 char prefix and 35 char suffix. Requests Troy Hunt&amp;rsquo;s pwnedpassword API for the prefix. Convert response to the dictionary with suffixes as keys and number of matches as values. And finally determine matches for initial PASSWORD by its hash suffix as a key.  </description>
+    </item>
+    
+    <item>
+      <title>Authors</title>
+      <link>https://passchek.github.com/post/authors/</link>
+      <pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://passchek.github.com/post/authors/</guid>
+      <description>Yevgeny Dyatlov (@edyatl)</description>
+    </item>
+    
+    <item>
+      <title>Contributing</title>
+      <link>https://passchek.github.com/post/contributing/</link>
+      <pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://passchek.github.com/post/contributing/</guid>
+      <description>The main repository if the code is at https://github.com/edyatl/passchek
+I&amp;rsquo;m happy to take from you any patches, pull requests, bug reports, ideas about new functionality and so on.</description>
+    </item>
+    
+    <item>
+      <title>Features</title>
+      <link>https://passchek.github.com/post/features/</link>
+      <pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://passchek.github.com/post/features/</guid>
+      <description> Checks one password or number of passwords. Shows a text sentence about compromising or just figures. It can be used in shell pipes, it can read stdin. It can display the SHA1 password hash in a tuple format (“prefix”, “suffix”) without an Internet request. Zero dependencies.  </description>
+    </item>
+    
+    <item>
+      <title>Help</title>
+      <link>https://passchek.github.com/post/help/</link>
+      <pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://passchek.github.com/post/help/</guid>
+      <description>For help screen just provide -h or --help as a command line option.
+Option -v or --version shows current version.</description>
+    </item>
+    
+    <item>
+      <title>Installation</title>
+      <link>https://passchek.github.com/post/installation/</link>
+      <pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://passchek.github.com/post/installation/</guid>
+      <description>You can simple download one script file passchek.py and use it with python3.
+Or try to install by pip.
+First check if package exists:
+$ python3 -m pip search passchek Install if package exists:
+$ python3 -m pip install --user passchek Or just:
+$ pip3 install passchek Installation for Windows users If you are want to use Passchek on Windows, first install Python 3 from https://www.python.org/downloads/windows/.
+While installation check at setup master something like Also install pip to install package manager pip with Python 3:</description>
+    </item>
+    
+    <item>
+      <title>License</title>
+      <link>https://passchek.github.com/post/license/</link>
+      <pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://passchek.github.com/post/license/</guid>
+      <description>This project is licensed under the MIT License.
+Copyright (c) 2020 Yevgeny Dyatlov (@edyatl)
+Please see the LICENSE file for details.</description>
+    </item>
+    
+    <item>
+      <title>Thanks</title>
+      <link>https://passchek.github.com/post/thanks/</link>
+      <pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://passchek.github.com/post/thanks/</guid>
+      <description>Thanks to Troy Hunt for collecting data and providing API.
+Thanks to James Ridgway for pwnedpasswords.sh bash script.</description>
+    </item>
+    
+    <item>
+      <title>Usage</title>
+      <link>https://passchek.github.com/post/usage/</link>
+      <pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://passchek.github.com/post/usage/</guid>
+      <description>Usage: passchek.py [options] [&amp;lt;PASSWORD&amp;gt;] Arguments: PASSWORD Provide (password | passwords) as argument or leave blank to provide via stdin or prompt Options: -h, --help Shows this help message and exit -n, --num-only Set output without accompanying text -p, --pipe For use in shell pipes, read stdin -s, --sha1 Shows SHA1 hash in tuple (&amp;#34;prefix&amp;#34;, &amp;#34;suffix&amp;#34;) and exit -v, --version Shows current version of the program and exit Security Note Please note that in case of using PASSWORD as command line argument it will be kept in .</description>
+    </item>
+    
+    <item>
+      <title>About</title>
+      <link>https://passchek.github.com/post/about/</link>
+      <pubDate>Wed, 07 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://passchek.github.com/post/about/</guid>
+      <description>Passchek is a python program for searching in Troy Hunt&amp;rsquo;s pwnedpassword API using the k-anonymity algorithm.
+Passchek was inspired by jamesridgway/pwnedpasswords.sh bash script.</description>
+    </item>
+    
+  </channel>
+</rss>
