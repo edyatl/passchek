@@ -10,7 +10,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/edyatl/passchek/LICENSE)
 [![Python3](https://img.shields.io/badge/python-3.5%20%7C%203.6%20%7C%203.7-blue)](https://github.com/edyatl/passchek)
 
-Passchek is a python program for searching in [Troy Hunt's pwnedpassword](https://www.troyhunt.com/ive-just-launched-pwned-passwords-version-2/) API using the k-anonymity algorithm. 
+Passchek is a python program for searching in [Troy Hunt's pwnedpassword API](https://haveibeenpwned.com/API/v3#SearchingPwnedPasswordsByRange) using the k-anonymity algorithm.
 
 Passchek was inspired by [jamesridgway](https://github.com/jamesridgway)/[pwnedpasswords.sh](https://github.com/jamesridgway/pwnedpasswords.sh) bash script.
 
@@ -20,7 +20,7 @@ Passchek was inspired by [jamesridgway](https://github.com/jamesridgway)/[pwnedp
 
 1. Hash the PASSWORD by SHA1.
 2. Split hash for 5 char prefix and 35 char suffix.
-3. Requests [Troy Hunt's pwnedpassword](https://www.troyhunt.com/ive-just-launched-pwned-passwords-version-2/) API for the prefix.
+3. Requests [Troy Hunt's pwnedpassword API](https://haveibeenpwned.com/API/v3#SearchingPwnedPasswordsByRange) for the prefix.
 4. Convert response to the dictionary with suffixes as keys and number of matches as values.
 5. And finally determine matches for initial PASSWORD by its hash suffix as a key.
 
@@ -53,6 +53,7 @@ Passchek was inspired by [jamesridgway](https://github.com/jamesridgway)/[pwnedp
 ```
 
 ### Security Note
+
 
 Please note that in case of using PASSWORD as command line argument it will be kept in .bash_history file in raw insecure format. Using via explicit prompt dialog is more secure and preferably.
 
@@ -109,7 +110,7 @@ F) Call **passchek** with option '-n' (--num-only) and with arguments 'qwerty', 
     0
 ```
 
-G) Use **passchek** with options '-np' (--num-only --pipe) in pipe with `cat pass_list.txt` to check all passwords in text file (In this example text file was created as `ls .. > pass_list.txt` in the script dir). You'll see numbers in new lines with matches in the pwnedpassword DB. 
+G) Use **passchek** with options '-np' (--num-only --pipe) in pipe with `cat pass_list.txt` to check all passwords in text file (In this example text file was created as `ls .. > pass_list.txt` in the script dir). You'll see numbers in new lines with matches in the pwnedpassword DB.
 
 ```sh
     $ cat pass_list.txt | python3 passchek.py -np
@@ -152,7 +153,8 @@ So no more weak passwords detected.
 
 ## Installation
 
-You can simple download one script file [passchek.py](./passchek/passchek.py) and use it with python3.
+
+You can simple download one script file [passchek.py](https://github.com/edyatl/passchek/blob/master/passchek/passchek.py) and use it with python3.
 
 Or try to install by pip.
 
@@ -169,6 +171,31 @@ Install if package exists:
 Or just:
 ```sh
     $ pip3 install passchek
+```
+
+
+### Installation for Windows users
+
+
+If you are want to use Passchek on Windows, first install Python 3 from https://www.python.org/downloads/windows/.
+
+While installation check at setup master  something like `Also install pip` to install package manager pip with Python 3:
+
+* [x] Also install pip version ...
+
+After Python 3 installation process type cmd.exe in run menu and press Enter to open console window.
+
+Then type in console window:
+```sh
+    C:\Users\User> pip install passchek
+```
+
+Try **passchek**, enter 'qwerty' as an example password. *Please note that when you are typing password via explicit prompt, nothing is displayed on the screen, this is normal and is used for security reasons.* 
+
+```sh
+    C:\Users\User> passchek 
+    Enter password: 
+    This password has appeared 3912816 times in data breaches.
 ```
 
 
@@ -209,4 +236,4 @@ This project is licensed under the MIT License.
 
 Copyright (c) 2020 Yevgeny Dyatlov ([@edyatl](https://github.com/edyatl))
 
-Please see the [LICENSE](LICENSE) file for details.
+Please see the [LICENSE](https://github.com/edyatl/passchek/blob/master/LICENSE) file for details.
