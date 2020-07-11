@@ -72,7 +72,8 @@ def reqst(*url_parts):
     req = urllib.request.Request(
         url=pwnd_url,
         headers={
-            'User-Agent': "passchek (Python)"
+            'User-Agent': "passchek (Python)",
+            'Add - Padding': "true"
         }
     )
     try:

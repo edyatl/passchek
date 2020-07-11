@@ -1,4 +1,4 @@
-![Passchek logo](https://svgshare.com/i/Lwy.svg)
+![Passchek logo](https://svgshare.com/i/Mmo.svg)
 
 
 # Passchek
@@ -6,7 +6,7 @@
 
 > Passchek is a simple cli tool, checks if your password has been compromised.
 
-[![Version: v0.2](https://img.shields.io/badge/version-v0.2.1-blue)](https://github.com/edyatl/passchek)
+[![Version: v0.2.1](https://img.shields.io/badge/version-v0.2.1-blue)](https://github.com/edyatl/passchek)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/edyatl/passchek/LICENSE)
 [![Python3](https://img.shields.io/badge/python-3.5%20%7C%203.6%20%7C%203.7-blue)](https://github.com/edyatl/passchek)
 
