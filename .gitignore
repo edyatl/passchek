@@ -7,6 +7,8 @@
 
 # custom
 .cache
+.venv
+
 #*.css
 *.py[cod]
 
@@ -33,3 +35,7 @@ files/
 
 # Installer logs
 pip-log.txt
+
+# Pipenv
+Pipfile
+Pipfile.lock

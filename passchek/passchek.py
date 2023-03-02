@@ -6,10 +6,11 @@ import urllib.request
 import sys
 import hashlib
 import getopt
-#from prompt_toolkit import prompt
+
+# from prompt_toolkit import prompt
 
 
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 
 def usage():
@@ -38,6 +39,7 @@ def hash_password(raw_pass):
     :param raw_pass: password in raw format
     :return: tuple (prefix of hash, suffix of hash)
     """
+    raw_pass = raw_pass if raw_pass else ""
     hash_pass = hashlib.sha1(raw_pass.encode("utf8")).hexdigest().upper()
     hash_pass_prefix = hash_pass[:5]
     hash_pass_suffix = hash_pass[5:]
@@ -92,20 +94,21 @@ def convert_key_val_tpl(line):
     :param line: string line from response 'hash_suffix:n_matches'
     :return: key value tuple ('hash_suffix', int)
     """
-    hash, count = line.split(":")
+    hash, count = line.split(":") if ":" in line else ('0', '0')
     return hash, int(count)
 
 
-def get_matches(passwrd=None):
+def get_matches(text_output=None, passwrd=None):
     """Get matches from pwnedpassword DB and show on screen
 
     :param passwrd: password in raw format
+    :return: prints result of matches
     """
     if passwrd:
         hash_pass = hash_password(passwrd)
     else:
         hash_pass = open_prompt_dialog()
-        
+
     matches = reqst("range", hash_pass[0])
     matches = dict(map(convert_key_val_tpl, matches.split("\r\n")))
     matches = matches.get(hash_pass[1])
@@ -117,15 +120,11 @@ def get_matches(passwrd=None):
         matches_txt = '%s'
         not_matches_txt = '0'
 
-    if matches:
-        print(matches_txt % matches)
-    else:
-        print(not_matches_txt)
+    return print(matches_txt % matches) if matches else print(not_matches_txt)
 
 
 def main():
     # Default flag for --num-only option
-    global text_output
     text_output = True
     # Default flag for --pipe option
     use_in_pipe = False
@@ -133,7 +132,9 @@ def main():
     # Parse command line arguments and options
     if len(sys.argv) > 1:
         try:
-            opts, args = getopt.gnu_getopt(sys.argv[1:], "hnpsv", ["help", "num-only", "pipe", "sha1", "version"])
+            opts, args = getopt.gnu_getopt(
+                sys.argv[1:], "hnpsv", ["help", "num-only", "pipe", "sha1", "version"]
+            )
         except getopt.GetoptError as err:
             # print help information and exit:
             print(err)  # will print something like "option -x not recognized"
@@ -183,16 +184,16 @@ def main():
                 passwrd = sys.argv[1]
         else:
             for _arg in args:
-                get_matches(_arg)
+                get_matches(text_output, _arg)
             if args:
                 sys.exit()
             if use_in_pipe:
                 for pass_line in sys.stdin.readlines():
-                    get_matches(pass_line.strip())
+                    get_matches(text_output, pass_line.strip())
             else:
-                get_matches()
+                get_matches(text_output)
     else:
-        get_matches()
+        get_matches(text_output)
 
 
 if __name__ == '__main__':
