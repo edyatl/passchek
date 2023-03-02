@@ -18,19 +18,24 @@ setuptools.setup(
     url="https://github.com/edyatl/passchek",
     packages=setuptools.find_packages(),
     include_package_data=True,
-
     entry_points={
         "console_scripts": [
             "passchek=passchek.passchek:main",
         ]
     },
-
     keywords=[
-        "passchek", "password", "pwned",
-        "troyhunt", "github", "k-anonymity",
-        "interactive", "console", "sha1",
-        "pwnedpassword", "versions",
-        "virtualenv"
+        "passchek",
+        "password",
+        "pwned",
+        "troyhunt",
+        "github",
+        "k-anonymity",
+        "interactive",
+        "console",
+        "sha1",
+        "pwnedpassword",
+        "versions",
+        "virtualenv",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -42,5 +47,5 @@ setuptools.setup(
         "Intended Audience :: End Users/Desktop",
         "Topic :: Utilities",
     ],
-    python_requires='>=3.5',
+    python_requires=">=3.5",
 )

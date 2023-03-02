@@ -1,4 +1,16 @@
 #!/usr/bin/env python3
+"""
+Passchek is a simple cli tool, checks if your password has been compromised.
+
+This tool utilizes the k-anonymity algorithm to query Troy Hunt's
+pwnedpassword API for password breaches.
+
+MIT License
+
+Developed by @edyatl <edyatl@yandex.ru> March 2023
+https://github.com/edyatl
+
+"""
 import os
 import getpass
 import urllib.error
@@ -7,15 +19,13 @@ import sys
 import hashlib
 import getopt
 
-# from prompt_toolkit import prompt
 
-
-__version__ = '0.2.2'
+__version__ = "0.2.2"
 
 
 def usage():
-    """Show usage help screen and exit"""
-    usg_text = '''    Passchek is a simple cli tool, checks if your password has been compromised.
+    """Show usage help screen and exit."""
+    usg_text = """    Passchek is a simple cli tool, checks if your password has been compromised.
     
     Usage:
         {} [options] [<PASSWORD>]
@@ -29,12 +39,12 @@ def usage():
         -p, --pipe      For use in shell pipes, read stdin
         -s, --sha1      Shows SHA1 hash in tuple ('prefix', 'suffix') and exit
         -v, --version   Shows current version of the program and exit
-    '''
+    """
     print(usg_text.format(os.path.basename(__file__)))
 
 
 def hash_password(raw_pass):
-    """Hashing raw password and split hash to prefix and suffix
+    """Hashing raw password and split hash to prefix and suffix.
 
     :param raw_pass: password in raw format
     :return: tuple (prefix of hash, suffix of hash)
@@ -47,16 +57,16 @@ def hash_password(raw_pass):
 
 
 def open_prompt_dialog():
-    """Open prompt dialog for enter password
+    """Open prompt dialog for enter password.
 
     :return: result tuple of hash_password (prefix of hash, suffix of hash)
     """
-    raw_pass = getpass.getpass('Enter password: ')
+    raw_pass = getpass.getpass("Enter password: ")
     return hash_password(raw_pass)
 
 
 def url_join(*url_parts):
-    """Join parts of url
+    """Join parts of url.
 
     :param url_parts: path + prefix of password hash
     :return: complete url string
@@ -65,41 +75,41 @@ def url_join(*url_parts):
 
 
 def reqst(*url_parts):
-    """Make request to Troy Hunt\'s pwnedpassword API
+    """Make request to Troy Hunt's pwnedpassword API.
 
     :param url_parts: path + prefix of password hash
-    :return: response string of Troy Hunt\'s pwnedpassword API
+    :return: response string of Troy Hunt's pwnedpassword API
     """
     pwnd_url = url_join(*url_parts)
     req = urllib.request.Request(
         url=pwnd_url,
         headers={
-            'User-Agent': "passchek " + __version__ + " (Python)",
-            'Add - Padding': "true",
-        }
+            "User-Agent": "passchek " + __version__ + " (Python)",
+            "Add - Padding": "true",
+        },
     )
     try:
-        with urllib.request.urlopen(req) as f:
-            response = f.read()
-    except (urllib.error.HTTPError, urllib.error.URLError) as e:
-        print("Exception found: {}".format(e))
+        with urllib.request.urlopen(req) as res:
+            response = res.read()
+    except (urllib.error.HTTPError, urllib.error.URLError) as err:
+        print("Exception found: {}".format(err))
         sys.exit()
     else:
         return response.decode("utf-8-sig")
 
 
 def convert_key_val_tpl(line):
-    """Convert response line from string to key, value tuple
+    """Convert response line from string to key, value tuple.
 
     :param line: string line from response 'hash_suffix:n_matches'
     :return: key value tuple ('hash_suffix', int)
     """
-    hash, count = line.split(":") if ":" in line else ('0', '0')
-    return hash, int(count)
+    _hash, count = line.split(":") if ":" in line else ("0", "0")
+    return _hash, int(count)
 
 
 def get_matches(text_output=None, passwrd=None):
-    """Get matches from pwnedpassword DB and show on screen
+    """Get matches from pwnedpassword DB and show on screen.
 
     :param passwrd: password in raw format
     :return: prints result of matches
@@ -114,16 +124,17 @@ def get_matches(text_output=None, passwrd=None):
     matches = matches.get(hash_pass[1])
 
     if text_output:
-        matches_txt = 'This password has appeared %s times in data breaches.'
-        not_matches_txt = 'This password has not appeared in any data breaches!'
+        matches_txt = "This password has appeared %s times in data breaches."
+        not_matches_txt = "This password has not appeared in any data breaches!"
     else:
-        matches_txt = '%s'
-        not_matches_txt = '0'
+        matches_txt = "%s"
+        not_matches_txt = "0"
 
     return print(matches_txt % matches) if matches else print(not_matches_txt)
 
+
 def handle_sha1_option(text_output, use_in_pipe, args):
-    """Handle the --sha1 option"""
+    """Handle the --sha1 option."""
     if args:
         for _arg in args:
             if text_output:
@@ -134,9 +145,9 @@ def handle_sha1_option(text_output, use_in_pipe, args):
     elif use_in_pipe:
         for pass_line in sys.stdin.readlines():
             if text_output:
-                sys.stdout.write('%s\n' % str(hash_password(pass_line.strip())))
+                sys.stdout.write("%s\n" % str(hash_password(pass_line.strip())))
             else:
-                sys.stdout.write('%s\n' % ' '.join(hash_password(pass_line.strip())))
+                sys.stdout.write("%s\n" % " ".join(hash_password(pass_line.strip())))
         sys.exit()
     else:
         if text_output:
@@ -145,64 +156,58 @@ def handle_sha1_option(text_output, use_in_pipe, args):
             print(*open_prompt_dialog())
         sys.exit()
 
+
 def main():
-    # Default flag for --num-only option
-    text_output = True
-    # Default flag for --pipe option
-    use_in_pipe = False
-    # Default flag for --sha1 option
-    sha1_output = False
+    """Define entry point of program."""
+    # Set default flags for options
+    text_output = True  # --num-only
+    use_in_pipe = False  # --pipe
+    sha1_output = False  # --sha1
 
     # Parse command line arguments and options
-    if len(sys.argv) > 1:
-        try:
-            opts, args = getopt.gnu_getopt(
-                sys.argv[1:], "hnpsv", ["help", "num-only", "pipe", "sha1", "version"]
-            )
-        except getopt.GetoptError as err:
-            # print help information and exit:
-            print(err)  # will print something like "option -x not recognized"
+    try:
+        opts, args = getopt.gnu_getopt(
+            sys.argv[1:], "hnpsv", ["help", "num-only", "pipe", "sha1", "version"]
+        )
+    except getopt.GetoptError as err:
+        # print help information and exit:
+        print(err)  # will print something like "option -x not recognized"
+        usage()
+        sys.exit(2)
+
+    for opt, _ in opts:
+        if opt in ("-h", "--help"):
             usage()
-            sys.exit(2)
-
-        for opt, arg in opts:
-            if opt in ("-h", "--help"):
-                usage()
-                sys.exit()
-            elif opt in ("-n", "--num-only"):
-                text_output = False
-            elif opt in ("-p", "--pipe"):
-                use_in_pipe = True
-            elif opt in ("-s", "--sha1"):
-                sha1_output = True
-            elif opt in ("-v", "--version"):
-                print('Passchek version: %s' % __version__)
-                sys.exit()
-            else:
-                assert False, "Unhandled option"
-
-        # Check if --sha1 option provided
-        if sha1_output:
-            handle_sha1_option(text_output, use_in_pipe, args)
-
-        # Check if password(s) were provided as arguments
-        if args:
-            for _arg in args:
-                get_matches(text_output, _arg)
+            sys.exit()
+        elif opt in ("-n", "--num-only"):
+            text_output = False
+        elif opt in ("-p", "--pipe"):
+            use_in_pipe = True
+        elif opt in ("-s", "--sha1"):
+            sha1_output = True
+        elif opt in ("-v", "--version"):
+            print("Passchek version: %s" % __version__)
             sys.exit()
 
-        # Check if piping is being used
-        if use_in_pipe:
-            for pass_line in sys.stdin.readlines():
-                get_matches(text_output, pass_line.strip())
-            sys.exit()
+    # Handle --sha1 option
+    if sha1_output:
+        handle_sha1_option(text_output, use_in_pipe, args)
 
-        # Prompt user for password
-        get_matches(text_output)
+    # Handle password(s) arguments
+    if args:
+        for _arg in args:
+            get_matches(text_output, _arg)
+        sys.exit()
 
-    else:
-        get_matches(text_output)
+    # Handle piping
+    if use_in_pipe:
+        for pass_line in sys.stdin.readlines():
+            get_matches(text_output, pass_line.strip())
+        sys.exit()
+
+    # Prompt user for password
+    get_matches(text_output)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
