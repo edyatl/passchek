@@ -74,8 +74,8 @@ def reqst(*url_parts):
     req = urllib.request.Request(
         url=pwnd_url,
         headers={
-            'User-Agent': "passchek (Python)",
-            'Add - Padding': "true"
+            'User-Agent': "passchek " + __version__ + " (Python)",
+            'Add - Padding': "true",
         }
     )
     try:
@@ -122,12 +122,36 @@ def get_matches(text_output=None, passwrd=None):
 
     return print(matches_txt % matches) if matches else print(not_matches_txt)
 
+def handle_sha1_option(text_output, use_in_pipe, args):
+    """Handle the --sha1 option"""
+    if args:
+        for _arg in args:
+            if text_output:
+                print(hash_password(_arg))
+            else:
+                print(*hash_password(_arg))
+        sys.exit()
+    elif use_in_pipe:
+        for pass_line in sys.stdin.readlines():
+            if text_output:
+                sys.stdout.write('%s\n' % str(hash_password(pass_line.strip())))
+            else:
+                sys.stdout.write('%s\n' % ' '.join(hash_password(pass_line.strip())))
+        sys.exit()
+    else:
+        if text_output:
+            print(open_prompt_dialog())
+        else:
+            print(*open_prompt_dialog())
+        sys.exit()
 
 def main():
     # Default flag for --num-only option
     text_output = True
     # Default flag for --pipe option
     use_in_pipe = False
+    # Default flag for --sha1 option
+    sha1_output = False
 
     # Parse command line arguments and options
     if len(sys.argv) > 1:
@@ -150,48 +174,32 @@ def main():
             elif opt in ("-p", "--pipe"):
                 use_in_pipe = True
             elif opt in ("-s", "--sha1"):
-                if args:
-                    for _arg in args:
-                        if text_output:
-                            print(hash_password(_arg))
-                        else:
-                            print(*hash_password(_arg))
-                    sys.exit()
-                elif use_in_pipe:
-                    for pass_line in sys.stdin.readlines():
-                        if text_output:
-                            sys.stdout.write('%s\n' % str(hash_password(pass_line.strip())))
-                        else:
-                            sys.stdout.write('%s\n' % ' '.join(hash_password(pass_line.strip())))
-                    sys.exit()
-                else:
-                    if text_output:
-                        print(open_prompt_dialog())
-                    else:
-                        print(*open_prompt_dialog())
-                    sys.exit()
+                sha1_output = True
             elif opt in ("-v", "--version"):
                 print('Passchek version: %s' % __version__)
                 sys.exit()
             else:
-                assert False, "unhandled option"
+                assert False, "Unhandled option"
 
-        if sys.argv[1] == '--':
-            sys.argv.pop(1)
-            if len(sys.argv) < 2:
-                passwrd = None
-            else:
-                passwrd = sys.argv[1]
-        else:
+        # Check if --sha1 option provided
+        if sha1_output:
+            handle_sha1_option(text_output, use_in_pipe, args)
+
+        # Check if password(s) were provided as arguments
+        if args:
             for _arg in args:
                 get_matches(text_output, _arg)
-            if args:
-                sys.exit()
-            if use_in_pipe:
-                for pass_line in sys.stdin.readlines():
-                    get_matches(text_output, pass_line.strip())
-            else:
-                get_matches(text_output)
+            sys.exit()
+
+        # Check if piping is being used
+        if use_in_pipe:
+            for pass_line in sys.stdin.readlines():
+                get_matches(text_output, pass_line.strip())
+            sys.exit()
+
+        # Prompt user for password
+        get_matches(text_output)
+
     else:
         get_matches(text_output)
 
