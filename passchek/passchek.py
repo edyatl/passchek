@@ -85,7 +85,7 @@ def reqst(*url_parts):
         url=pwnd_url,
         headers={
             "User-Agent": "passchek " + __version__ + " (Python)",
-            "Add - Padding": "true",
+            "Add-Padding": "true",
         },
     )
     try:
