@@ -214,6 +214,8 @@ The main repository if the code is at https://github.com/edyatl/passchek
 
 I'm happy to take from you any patches, pull requests,  bug reports,  ideas about new functionality and so on.
 
+If you find this project useful, don't forget to give it a star ⭐️ on Github  to show your support!
+
 
 ## Thanks
 
