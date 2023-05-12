@@ -6,18 +6,14 @@
     <description>Recent content in Sections on Passchek</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 09 Jul 2020 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://edyatl.github.io/passchek/post/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <lastBuildDate>Thu, 09 Jul 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://edyatl.github.io/passchek/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Algorithm</title>
       <link>https://edyatl.github.io/passchek/post/algorithm/</link>
       <pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate>
       
       <guid>https://edyatl.github.io/passchek/post/algorithm/</guid>
-      <description> Hash the PASSWORD by SHA1. Split hash for 5 char prefix and 35 char suffix. Requests Troy Hunt&amp;rsquo;s pwnedpassword API for the prefix. Convert response to the dictionary with suffixes as keys and number of matches as values. And finally determine matches for initial PASSWORD by its hash suffix as a key.  </description>
+      <description> Hash the PASSWORD by SHA1. Split hash for 5 char prefix and 35 char suffix. Requests Troy Hunt&amp;rsquo;s pwnedpassword API for the prefix. Convert response to the dictionary with suffixes as keys and number of matches as values. And finally determine matches for initial PASSWORD by its hash suffix as a key. </description>
     </item>
     
     <item>
@@ -45,7 +41,7 @@ I&amp;rsquo;m happy to take from you any patches, pull requests, bug reports, id
       <pubDate>Thu, 09 Jul 2020 00:00:00 +0000</pubDate>
       
       <guid>https://edyatl.github.io/passchek/post/features/</guid>
-      <description> Checks one password or number of passwords. Shows a text sentence about compromising or just figures. It can be used in shell pipes, it can read stdin. It can display the SHA1 password hash in a tuple format (“prefix”, “suffix”) without an Internet request. Zero dependencies.  </description>
+      <description> Checks one password or number of passwords. Shows a text sentence about compromising or just figures. It can be used in shell pipes, it can read stdin. It can display the SHA1 password hash in a tuple format (“prefix”, “suffix”) without an Internet request. Zero dependencies. </description>
     </item>
     
     <item>
