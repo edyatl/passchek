@@ -18,12 +18,13 @@ import urllib.request
 import sys
 import hashlib
 import getopt
+from typing import Optional, Tuple
 
 
 __version__ = "0.2.2"
 
 
-def usage():
+def usage() -> None:
     """Show usage help screen and exit."""
     usg_text = f"""Passchek is a simple cli tool, checks if your password has been compromised.
 
@@ -43,7 +44,7 @@ Options:
     print(usg_text)
 
 
-def hash_password(raw_pass):
+def hash_password(raw_pass: Optional[str] = None) -> Tuple[str, str]:
     """Hashing raw password and split hash to prefix and suffix.
 
     :param raw_pass: password in raw format
@@ -56,7 +57,7 @@ def hash_password(raw_pass):
     return hash_pass_prefix, hash_pass_suffix
 
 
-def open_prompt_dialog():
+def open_prompt_dialog() -> Tuple[str, str]:
     """Open prompt dialog for enter password.
 
     :return: result tuple of hash_password (prefix of hash, suffix of hash)
@@ -65,7 +66,7 @@ def open_prompt_dialog():
     return hash_password(raw_pass)
 
 
-def url_join(*url_parts):
+def url_join(*url_parts: str) -> str:
     """Join parts of url.
 
     :param url_parts: path + prefix of password hash
@@ -74,7 +75,7 @@ def url_join(*url_parts):
     return "https://api.pwnedpasswords.com/" + "/".join(url_parts)
 
 
-def reqst(*url_parts):
+def reqst(*url_parts: str) -> str:
     """Make request to Troy Hunt's pwnedpassword API.
 
     :param url_parts: path + prefix of password hash
@@ -98,7 +99,7 @@ def reqst(*url_parts):
         return response.decode("utf-8-sig")
 
 
-def convert_key_val_tpl(line):
+def convert_key_val_tpl(line: str) -> Tuple[str, int]:
     """Convert response line from string to key, value tuple.
 
     :param line: string line from response 'hash_suffix:n_matches'
@@ -108,7 +109,7 @@ def convert_key_val_tpl(line):
     return _hash, int(count)
 
 
-def get_matches(text_output=None, passwrd=None):
+def get_matches(text_output: bool = True, passwrd: Optional[str] = None) -> None:
     """Get matches from pwnedpassword DB and show on screen.
 
     :param passwrd: password in raw format
@@ -133,7 +134,7 @@ def get_matches(text_output=None, passwrd=None):
     return print(matches_txt % matches) if matches else print(not_matches_txt)
 
 
-def handle_sha1_option(text_output, use_in_pipe, args):
+def handle_sha1_option(text_output: bool, use_in_pipe: bool, args: list[str]) -> None:
     """Handle the --sha1 option."""
     if args:
         for _arg in args:
@@ -157,12 +158,12 @@ def handle_sha1_option(text_output, use_in_pipe, args):
         sys.exit()
 
 
-def main():
+def main() -> None:
     """Define entry point of program."""
     # Set default flags for options
-    text_output = True  # --num-only
-    use_in_pipe = False  # --pipe
-    sha1_output = False  # --sha1
+    text_output: bool = True  # --num-only
+    use_in_pipe: bool = False  # --pipe
+    sha1_output: bool = False  # --sha1
 
     # Parse command line arguments and options
     try:
