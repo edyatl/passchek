@@ -25,22 +25,22 @@ __version__ = "0.2.2"
 
 def usage():
     """Show usage help screen and exit."""
-    usg_text = """    Passchek is a simple cli tool, checks if your password has been compromised.
-    
-    Usage:
-        {} [options] [<PASSWORD>]
+    usg_text = f"""Passchek is a simple cli tool, checks if your password has been compromised.
 
-    Arguments:
-        PASSWORD Provide (password | passwords) as argument or leave blank to provide via stdin or prompt
+Usage:
+    {os.path.basename(__file__)} [options] [<PASSWORD>]
 
-    Options:
-        -h, --help      Shows this help message and exit
-        -n, --num-only  Set output without accompanying text
-        -p, --pipe      For use in shell pipes, read stdin
-        -s, --sha1      Shows SHA1 hash in tuple ('prefix', 'suffix') and exit
-        -v, --version   Shows current version of the program and exit
-    """
-    print(usg_text.format(os.path.basename(__file__)))
+Arguments:
+    PASSWORD Provide (password | passwords) as argument or leave blank to provide via stdin or prompt
+
+Options:
+    -h, --help      Shows this help message and exit
+    -n, --num-only  Set output without accompanying text
+    -p, --pipe      For use in shell pipes, read stdin
+    -s, --sha1      Shows SHA1 hash in tuple ('prefix', 'suffix') and exit
+    -v, --version   Shows current version of the program and exit
+"""
+    print(usg_text)
 
 
 def hash_password(raw_pass):
