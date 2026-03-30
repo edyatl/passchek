@@ -26,6 +26,7 @@ bin
 var
 sdist
 develop-eggs
+__pycache__
 .installed.cfg
 lib
 lib64
@@ -39,3 +40,13 @@ pip-log.txt
 # Pipenv
 Pipfile
 Pipfile.lock
+.aider*
+# vim
+*.un
+*.un~
+*~
+# ENV
+.env
+
+# Pylint config
+.pylintrc
