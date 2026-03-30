@@ -46,7 +46,7 @@ def hash_password(raw_pass: Optional[str] = None) -> Tuple[str, str]:
     :return: tuple (prefix of hash, suffix of hash)
     """
     raw_pass = raw_pass if raw_pass else ""
-    hash_pass = hashlib.sha1(raw_pass.encode("utf8")).hexdigest().upper()
+    hash_pass = hashlib.sha1(raw_pass.encode("utf-8"), usedforsecurity=True).hexdigest().upper()
     hash_pass_prefix = hash_pass[:5]
     hash_pass_suffix = hash_pass[5:]
     return hash_pass_prefix, hash_pass_suffix
