@@ -23,6 +23,8 @@ from typing import Optional, Tuple
 
 __version__ = "0.2.3"
 
+_API = "https://api.pwnedpasswords.com/range/"
+
 
 def usage() -> None:
     """Show usage help screen and exit."""
@@ -61,22 +63,13 @@ def open_prompt_dialog() -> Tuple[str, str]:
     return hash_password(raw_pass)
 
 
-def url_join(*url_parts: str) -> str:
-    """Join parts of url.
-
-    :param url_parts: path + prefix of password hash
-    :return: complete url string
-    """
-    return "https://api.pwnedpasswords.com/" + "/".join(url_parts)
-
-
-def reqst(*url_parts: str) -> str:
+def reqst(prefix: str) -> str:
     """Make request to Troy Hunt's pwnedpassword API.
 
     :param url_parts: path + prefix of password hash
     :return: response string of Troy Hunt's pwnedpassword API
     """
-    pwnd_url = url_join(*url_parts)
+    pwnd_url = _API + prefix
     req = urllib.request.Request(
         url=pwnd_url,
         headers={
@@ -115,7 +108,7 @@ def get_matches(text_output: bool = True, passwrd: Optional[str] = None) -> None
     else:
         hash_pass = open_prompt_dialog()
 
-    matches = reqst("range", hash_pass[0])
+    matches = reqst(hash_pass[0])
     matches = dict(map(convert_key_val_tpl, matches.split("\r\n")))
     matches = matches.get(hash_pass[1])
 

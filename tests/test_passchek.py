@@ -16,9 +16,9 @@ def test_hash_password():
     assert hash_password("1234") == ("7110E", "DA4D09E062AA5E4A390B0A572AC0D2C0220")
 
 
-def test_url_join():
-    assert url_join("range", "B1B37") == "https://api.pwnedpasswords.com/range/B1B37"
-    assert url_join("range", "5BAA6") == "https://api.pwnedpasswords.com/range/5BAA6"
+# def test_url_join():
+    # assert url_join("range", "B1B37") == "https://api.pwnedpasswords.com/range/B1B37"
+    # assert url_join("range", "5BAA6") == "https://api.pwnedpasswords.com/range/5BAA6"
 
 
 def test_convert_key_val_tpl():
@@ -52,7 +52,7 @@ def test_reqst(mock_urlopen):
 def test_get_matches(mock_print, mock_getpass, mock_reqst):
     mock_reqst.return_value = "0018A45C4D1DEF81644B54AB7F969B88D65:1\r\n1E4C9B93F3F0682250B6CF8331B7EE68FD8:2\r\n011053FD0102E94D6AE2F8B83D76FAF94F6:1"
     get_matches(True)
-    mock_reqst.assert_called_once_with("range", "5BAA6")
+    mock_reqst.assert_called_once_with("5BAA6")
     # Test case 1: Password has matches in pwnedpassword DB
     mock_print.assert_called_once_with(
         "This password has appeared 2 times in data breaches."
