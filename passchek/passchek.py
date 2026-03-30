@@ -21,18 +21,14 @@ import getopt
 from typing import Optional, Tuple
 
 
-__version__ = "0.2.2"
+__version__ = "0.2.3"
 
 
 def usage() -> None:
     """Show usage help screen and exit."""
-    usg_text = f"""Passchek is a simple cli tool, checks if your password has been compromised.
+    print(f"""Passchek is a simple cli tool, checks if your password has been compromised.
 
-Usage:
-    {os.path.basename(__file__)} [options] [<PASSWORD>]
-
-Arguments:
-    PASSWORD Provide (password | passwords) as argument or leave blank to provide via stdin or prompt
+Usage: {os.path.basename(__file__)} [options] [PASSWORD ...]
 
 Options:
     -h, --help      Shows this help message and exit
@@ -40,8 +36,7 @@ Options:
     -p, --pipe      For use in shell pipes, read stdin
     -s, --sha1      Shows SHA1 hash in tuple ('prefix', 'suffix') and exit
     -v, --version   Shows current version of the program and exit
-"""
-    print(usg_text)
+""")
 
 
 def hash_password(raw_pass: Optional[str] = None) -> Tuple[str, str]:
