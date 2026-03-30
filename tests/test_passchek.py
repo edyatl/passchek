@@ -76,7 +76,7 @@ def test_get_matches(mock_print, mock_getpass, mock_reqst):
     mock_reqst.assert_called()
 
     # Test case 4: Text output is False
-    get_matches()
+    get_matches(False)
     mock_print.assert_called_with("0")
     mock_reqst.assert_called()
 
