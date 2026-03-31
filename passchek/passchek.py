@@ -49,9 +49,7 @@ def hash_password(raw_pass: Optional[str] = None) -> Tuple[str, str]:
     """
     raw_pass = raw_pass if raw_pass else ""
     hash_pass = hashlib.sha1(raw_pass.encode("utf-8"), usedforsecurity=True).hexdigest().upper()
-    hash_pass_prefix = hash_pass[:5]
-    hash_pass_suffix = hash_pass[5:]
-    return hash_pass_prefix, hash_pass_suffix
+    return hash_pass[:5], hash_pass[5:]
 
 
 def open_prompt_dialog() -> Tuple[str, str]:
@@ -66,12 +64,11 @@ def open_prompt_dialog() -> Tuple[str, str]:
 def reqst(prefix: str) -> str:
     """Make request to Troy Hunt's pwnedpassword API.
 
-    :param url_parts: path + prefix of password hash
+    :param prefix: prefix of password hash
     :return: response string of Troy Hunt's pwnedpassword API
     """
-    pwnd_url = _API + prefix
     req = urllib.request.Request(
-        url=pwnd_url,
+        url=_API + prefix,
         headers={
             "User-Agent": "passchek " + __version__ + " (Python)",
             "Add-Padding": "true",
@@ -79,12 +76,10 @@ def reqst(prefix: str) -> str:
     )
     try:
         with urllib.request.urlopen(req) as res:
-            response = res.read()
+            return res.read().decode("utf-8-sig")
     except (urllib.error.HTTPError, urllib.error.URLError) as err:
         print("Exception found: {}".format(err))
         sys.exit()
-    else:
-        return response.decode("utf-8-sig")
 
 
 def convert_key_val_tpl(line: str) -> Tuple[str, int]:
