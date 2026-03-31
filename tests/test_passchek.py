@@ -21,15 +21,15 @@ def test_hash_password():
     # assert url_join("range", "5BAA6") == "https://api.pwnedpasswords.com/range/5BAA6"
 
 
-def test_convert_key_val_tpl():
-    assert convert_key_val_tpl("08613D876336B480896C990CCC9451C66C5:12") == (
-        "08613D876336B480896C990CCC9451C66C5",
-        12,
-    )
-    assert convert_key_val_tpl("34ECD5DC2D7B0ECE7998AFB5C7AFC33A7AFD7:10") == (
-        "34ECD5DC2D7B0ECE7998AFB5C7AFC33A7AFD7",
-        10,
-    )
+# def test_convert_key_val_tpl():
+    # assert convert_key_val_tpl("08613D876336B480896C990CCC9451C66C5:12") == (
+        # "08613D876336B480896C990CCC9451C66C5",
+        # 12,
+    # )
+    # assert convert_key_val_tpl("34ECD5DC2D7B0ECE7998AFB5C7AFC33A7AFD7:10") == (
+        # "34ECD5DC2D7B0ECE7998AFB5C7AFC33A7AFD7",
+        # 10,
+    # )
 
 
 @patch("passchek.passchek.urllib.request.urlopen")

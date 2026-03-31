@@ -82,16 +82,6 @@ def reqst(prefix: str) -> str:
         sys.exit()
 
 
-def convert_key_val_tpl(line: str) -> Tuple[str, int]:
-    """Convert response line from string to key, value tuple.
-
-    :param line: string line from response 'hash_suffix:n_matches'
-    :return: key value tuple ('hash_suffix', int)
-    """
-    _hash, count = line.split(":") if ":" in line else ("0", "0")
-    return _hash, int(count)
-
-
 def pwned_count(password: str) -> int:
     """Return how many times *password* appears in breach data (0 = not found).
 
