@@ -100,21 +100,21 @@ def pwned_count(password: str) -> int:
 
 
 def get_matches(text_output: bool = True, passwrd: str | None = None) -> None:
-    """Get matches from pwnedpassword DB and show on screen.
+    """Print the number of pwned-password matches.
 
-    :param passwrd: password in raw format
-    :return: prints result of matches
+    :param text_output: Whether to print a human-readable message.
+    :param passwrd: Password in raw format.
     """
     matches = pwned_count(passwrd)
 
     if text_output:
-        matches_txt = "This password has appeared %s times in data breaches."
-        not_matches_txt = "This password has not appeared in any data breaches!"
+        print(
+            f"This password has appeared {matches} times in data breaches."
+            if matches
+            else "This password has not appeared in any data breaches!"
+        )
     else:
-        matches_txt = "%s"
-        not_matches_txt = "0"
-
-    return print(matches_txt % matches) if matches else print(not_matches_txt)
+        print(matches)
 
 
 def handle_sha1_option(text_output: bool, use_in_pipe: bool, args: list[str]) -> None:
