@@ -92,20 +92,31 @@ def convert_key_val_tpl(line: str) -> Tuple[str, int]:
     return _hash, int(count)
 
 
+def pwned_count(password: str) -> int:
+    """Return how many times *password* appears in breach data (0 = not found).
+
+    :param passwrd: password in raw format
+    :return: count of matches
+    """
+    if password:
+        prefix, suffix = hash_password(password)
+    else:
+        prefix, suffix = open_prompt_dialog()
+
+    for line in reqst(prefix).splitlines():
+        tail, sep, count = line.partition(":")
+        if tail == suffix:
+            return int(count)
+    return 0
+
+
 def get_matches(text_output: bool = True, passwrd: Optional[str] = None) -> None:
     """Get matches from pwnedpassword DB and show on screen.
 
     :param passwrd: password in raw format
     :return: prints result of matches
     """
-    if passwrd:
-        hash_pass = hash_password(passwrd)
-    else:
-        hash_pass = open_prompt_dialog()
-
-    matches = reqst(hash_pass[0])
-    matches = dict(map(convert_key_val_tpl, matches.split("\r\n")))
-    matches = matches.get(hash_pass[1])
+    matches = pwned_count(passwrd)
 
     if text_output:
         matches_txt = "This password has appeared %s times in data breaches."
