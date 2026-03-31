@@ -18,7 +18,6 @@ import urllib.request
 import sys
 import hashlib
 import getopt
-from typing import Optional, Tuple
 
 
 __version__ = "0.2.3"
@@ -41,7 +40,7 @@ Options:
 """)
 
 
-def hash_password(raw_pass: Optional[str] = None) -> Tuple[str, str]:
+def hash_password(raw_pass: str | None = None) -> tuple[str, str]:
     """Hashing raw password and split hash to prefix and suffix.
 
     :param raw_pass: password in raw format
@@ -52,7 +51,7 @@ def hash_password(raw_pass: Optional[str] = None) -> Tuple[str, str]:
     return hash_pass[:5], hash_pass[5:]
 
 
-def open_prompt_dialog() -> Tuple[str, str]:
+def open_prompt_dialog() -> tuple[str, str]:
     """Open prompt dialog for enter password.
 
     :return: result tuple of hash_password (prefix of hash, suffix of hash)
@@ -100,7 +99,7 @@ def pwned_count(password: str) -> int:
     return 0
 
 
-def get_matches(text_output: bool = True, passwrd: Optional[str] = None) -> None:
+def get_matches(text_output: bool = True, passwrd: str | None = None) -> None:
     """Get matches from pwnedpassword DB and show on screen.
 
     :param passwrd: password in raw format
