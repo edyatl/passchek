@@ -78,7 +78,7 @@ def reqst(prefix: str) -> str:
             return res.read().decode("utf-8-sig")
     except (urllib.error.HTTPError, urllib.error.URLError) as err:
         print("Exception found: {}".format(err))
-        sys.exit()
+        sys.exit(1)
 
 
 def pwned_count(password: str) -> int:
@@ -119,26 +119,23 @@ def get_matches(text_output: bool = True, passwrd: str | None = None) -> None:
 
 def handle_sha1_option(text_output: bool, use_in_pipe: bool, args: list[str]) -> None:
     """Handle the --sha1 option."""
+
+    def emit(password: str) -> None:
+        result = hash_password(password)
+        print(result if text_output else " ".join(result))
+
     if args:
-        for _arg in args:
-            if text_output:
-                print(hash_password(_arg))
-            else:
-                print(*hash_password(_arg))
+        for arg in args:
+            emit(arg)
         sys.exit()
-    elif use_in_pipe:
-        for pass_line in sys.stdin.readlines():
-            if text_output:
-                sys.stdout.write("%s\n" % str(hash_password(pass_line.strip())))
-            else:
-                sys.stdout.write("%s\n" % " ".join(hash_password(pass_line.strip())))
+
+    if use_in_pipe:
+        for line in sys.stdin:
+            emit(line.strip())
         sys.exit()
-    else:
-        if text_output:
-            print(open_prompt_dialog())
-        else:
-            print(*open_prompt_dialog())
-        sys.exit()
+
+    emit(open_prompt_dialog())
+    sys.exit()
 
 
 def main() -> None:
