@@ -7,7 +7,7 @@ pwnedpassword API for password breaches.
 
 MIT License
 
-Developed by @edyatl <edyatl@yandex.ru> March 2023
+Developed by @edyatl <edyatl@yandex.ru> April 2026
 https://github.com/edyatl
 
 """
@@ -40,14 +40,14 @@ Options:
 """)
 
 
-def hash_password(raw_pass: str | None = None) -> tuple[str, str]:
+def hash_password(pw: str | None = None) -> tuple[str, str]:
     """Hashing raw password and split hash to prefix and suffix.
 
-    :param raw_pass: password in raw format
+    :param pw: password in raw format
     :return: tuple (prefix of hash, suffix of hash)
     """
-    raw_pass = raw_pass if raw_pass else ""
-    hash_pass = hashlib.sha1(raw_pass.encode("utf-8"), usedforsecurity=True).hexdigest().upper()
+    pw = pw if pw else ""
+    hash_pass = hashlib.sha1(pw.encode("utf-8"), usedforsecurity=True).hexdigest().upper()
     return hash_pass[:5], hash_pass[5:]
 
 
@@ -56,8 +56,8 @@ def open_prompt_dialog() -> tuple[str, str]:
 
     :return: result tuple of hash_password (prefix of hash, suffix of hash)
     """
-    raw_pass = getpass.getpass("Enter password: ")
-    return hash_password(raw_pass)
+    pw = getpass.getpass("Enter password: ")
+    return hash_password(pw)
 
 
 def reqst(prefix: str) -> str:
@@ -149,7 +149,6 @@ def parse_cli(argv: list[str]) -> tuple[bool, bool, bool, list[str]]:
         usage()
         sys.exit(2)
 
-    # Set default flags for options
     text_output: bool = True  # --num-only
     use_in_pipe: bool = False  # --pipe
     sha1_output: bool = False  # --sha1
@@ -167,11 +166,12 @@ def parse_cli(argv: list[str]) -> tuple[bool, bool, bool, list[str]]:
         elif opt in ("-v", "--version"):
             print(f"Passchek version: {__version__}")
             sys.exit()
+
     return text_output, use_in_pipe, sha1_output, args
 
 
 def main() -> None:
-    """Define entry point of program."""
+    """Program entry point."""
     text_output, use_in_pipe, sha1_output, args = parse_cli(sys.argv[1:])
 
     # Handle --sha1 option
@@ -180,15 +180,15 @@ def main() -> None:
 
     # Handle password(s) arguments
     if args:
-        for _arg in args:
-            get_matches(text_output, _arg)
-        sys.exit()
+        for pw in args:
+            get_matches(text_output, pw)
+        return
 
     # Handle piping
     if use_in_pipe:
-        for pass_line in sys.stdin.readlines():
-            get_matches(text_output, pass_line.strip())
-        sys.exit()
+        for line in sys.stdin:
+            get_matches(text_output, line.strip())
+        return
 
     # Prompt user for password
     get_matches(text_output)
