@@ -138,23 +138,21 @@ def handle_sha1_option(text_output: bool, use_in_pipe: bool, args: list[str]) ->
     sys.exit()
 
 
-def main() -> None:
-    """Define entry point of program."""
+def parse_cli(argv: list[str]) -> tuple[bool, bool, bool, list[str]]:
+    """Parse command-line arguments into structured options."""
+    try:
+        opts, args = getopt.gnu_getopt(
+            argv, "hnpsv", ["help", "num-only", "pipe", "sha1", "version"]
+        )
+    except getopt.GetoptError as err:
+        print(err)
+        usage()
+        sys.exit(2)
+
     # Set default flags for options
     text_output: bool = True  # --num-only
     use_in_pipe: bool = False  # --pipe
     sha1_output: bool = False  # --sha1
-
-    # Parse command line arguments and options
-    try:
-        opts, args = getopt.gnu_getopt(
-            sys.argv[1:], "hnpsv", ["help", "num-only", "pipe", "sha1", "version"]
-        )
-    except getopt.GetoptError as err:
-        # print help information and exit:
-        print(err)  # will print something like "option -x not recognized"
-        usage()
-        sys.exit(2)
 
     for opt, _ in opts:
         if opt in ("-h", "--help"):
@@ -167,8 +165,14 @@ def main() -> None:
         elif opt in ("-s", "--sha1"):
             sha1_output = True
         elif opt in ("-v", "--version"):
-            print("Passchek version: %s" % __version__)
+            print(f"Passchek version: {__version__}")
             sys.exit()
+    return text_output, use_in_pipe, sha1_output, args
+
+
+def main() -> None:
+    """Define entry point of program."""
+    text_output, use_in_pipe, sha1_output, args = parse_cli(sys.argv[1:])
 
     # Handle --sha1 option
     if sha1_output:
