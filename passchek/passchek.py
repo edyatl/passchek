@@ -67,9 +67,9 @@ def reqst(prefix: str) -> str:
     :return: response string of Troy Hunt's pwnedpassword API
     """
     req = urllib.request.Request(
-        url=_API + prefix,
+        url=f"{_API}{prefix}",
         headers={
-            "User-Agent": "passchek " + __version__ + " (Python)",
+            "User-Agent": f"passchek {__version__} (Python)",
             "Add-Padding": "true",
         },
     )
@@ -77,7 +77,7 @@ def reqst(prefix: str) -> str:
         with urllib.request.urlopen(req) as res:
             return res.read().decode("utf-8-sig")
     except (urllib.error.HTTPError, urllib.error.URLError) as err:
-        print("Exception found: {}".format(err))
+        print(f"Exception found: {err}")
         sys.exit(1)
 
 
