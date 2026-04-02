@@ -1,119 +1,352 @@
 #!/usr/bin/env python3
+import sys
 import pytest
-
-# import io
 import unittest.mock as mock
-from unittest.mock import patch, mock_open, MagicMock
-from click.testing import CliRunner
-
-# import passchek.passchek as app
-from passchek.passchek import *
-
-
-def test_hash_password():
-    assert hash_password("qwerty") == ("B1B37", "73A05C0ED0176787A4F1574FF0075F7521E")
-    assert hash_password("password") == ("5BAA6", "1E4C9B93F3F0682250B6CF8331B7EE68FD8")
-    assert hash_password("1234") == ("7110E", "DA4D09E062AA5E4A390B0A572AC0D2C0220")
-
-
-# def test_url_join():
-    # assert url_join("range", "B1B37") == "https://api.pwnedpasswords.com/range/B1B37"
-    # assert url_join("range", "5BAA6") == "https://api.pwnedpasswords.com/range/5BAA6"
+from unittest.mock import patch, MagicMock, call
+from passchek.passchek import (
+    hash_password,
+    pwned_count,
+    reqst,
+    get_matches,
+    usage,
+    main,
+    __version__,
+)
 
 
-# def test_convert_key_val_tpl():
-    # assert convert_key_val_tpl("08613D876336B480896C990CCC9451C66C5:12") == (
-        # "08613D876336B480896C990CCC9451C66C5",
-        # 12,
-    # )
-    # assert convert_key_val_tpl("34ECD5DC2D7B0ECE7998AFB5C7AFC33A7AFD7:10") == (
-        # "34ECD5DC2D7B0ECE7998AFB5C7AFC33A7AFD7",
-        # 10,
-    # )
+# ---------------------------------------------------------------------------
+# hash_password
+# ---------------------------------------------------------------------------
+
+class TestHashPassword:
+    def test_known_vectors(self):
+        assert hash_password("qwerty") == ("B1B37", "73A05C0ED0176787A4F1574FF0075F7521E")
+        assert hash_password("password") == ("5BAA6", "1E4C9B93F3F0682250B6CF8331B7EE68FD8")
+        assert hash_password("1234") == ("7110E", "DA4D09E062AA5E4A390B0A572AC0D2C0220")
+
+    def test_empty_string(self):
+        prefix, suffix = hash_password("")
+        assert len(prefix) == 5
+        assert len(suffix) == 35
+        assert (prefix + suffix) == "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709"
+
+    def test_returns_uppercase(self):
+        prefix, suffix = hash_password("abc")
+        assert prefix == prefix.upper()
+        assert suffix == suffix.upper()
+
+    def test_prefix_always_five_chars(self):
+        for pw in ("a", "abc", "correct horse battery staple", "🔑"):
+            prefix, suffix = hash_password(pw)
+            assert len(prefix) == 5
+            assert len(suffix) == 35
+
+    def test_unicode_password(self):
+        prefix, suffix = hash_password("pässwörд")
+        assert len(prefix) == 5
+        assert len(suffix) == 35
 
 
-@patch("passchek.passchek.urllib.request.urlopen")
-def test_reqst(mock_urlopen):
-    response_text = b"0018A45C4D1DEF81644B54AB7F969B88D65:1\n00D4F6E8FA6EECAD2A3AA415EEC418D38EC:2\n011053FD0102E94D6AE2F8B83D76FAF94F6:1\n"
-    cm = MagicMock()
-    cm.getcode.return_value = 200
-    cm.read.return_value = response_text
-    cm.__enter__.return_value = cm
-    mock_urlopen.return_value = cm
+# ---------------------------------------------------------------------------
+# reqst
+# ---------------------------------------------------------------------------
 
-    response = reqst("0018A")
-    assert response == response_text.decode("utf-8-sig")
-    mock_urlopen.assert_called_once()
+class TestFetch:
+    @patch("passchek.passchek.urllib.request.urlopen")
+    def test_returns_decoded_body(self, mock_urlopen):
+        body = b"0018A45C4D1DEF81644B54AB7F969B88D65:1\r\n00D4F6E8FA6EECAD2A3AA415EEC418D38EC:2\r\n"
+        cm = MagicMock()
+        cm.read.return_value = body
+        cm.__enter__.return_value = cm
+        mock_urlopen.return_value = cm
 
+        result = reqst("0018A")
+        assert result == body.decode("utf-8-sig")
+        mock_urlopen.assert_called_once()
 
-@patch("passchek.passchek.reqst")
-@patch("passchek.passchek.getpass.getpass", return_value="password")
-@patch("builtins.print")
-def test_get_matches(mock_print, mock_getpass, mock_reqst):
-    mock_reqst.return_value = "0018A45C4D1DEF81644B54AB7F969B88D65:1\r\n1E4C9B93F3F0682250B6CF8331B7EE68FD8:2\r\n011053FD0102E94D6AE2F8B83D76FAF94F6:1"
-    get_matches(True)
-    mock_reqst.assert_called_once_with("5BAA6")
-    # Test case 1: Password has matches in pwnedpassword DB
-    mock_print.assert_called_once_with(
-        "This password has appeared 2 times in data breaches."
+    @patch("passchek.passchek.urllib.request.urlopen")
+    def test_request_url_contains_prefix(self, mock_urlopen):
+        cm = MagicMock()
+        cm.read.return_value = b""
+        cm.__enter__.return_value = cm
+        mock_urlopen.return_value = cm
+
+        reqst("ABCDE")
+        url_used = mock_urlopen.call_args[0][0].full_url
+        assert "ABCDE" in url_used
+
+    @patch("passchek.passchek.urllib.request.urlopen")
+    def test_request_includes_padding_header(self, mock_urlopen):
+        cm = MagicMock()
+        cm.read.return_value = b""
+        cm.__enter__.return_value = cm
+        mock_urlopen.return_value = cm
+
+        reqst("ABCDE")
+        req = mock_urlopen.call_args[0][0]
+        assert req.get_header("Add-padding") == "true"
+
+    @patch("passchek.passchek.urllib.request.urlopen", side_effect=Exception("timeout"))
+    def test_network_error_exits(self, _):
+        with pytest.raises(SystemExit):
+            reqst("ABCDE")
+
+    @patch(
+        "passchek.passchek.urllib.request.urlopen",
+        side_effect=__import__("urllib").error.URLError("unreachable"),
     )
-    mock_reqst.assert_called_once()
-
-    # Test case 2: Password has no matches in pwnedpassword DB
-    mock_reqst.return_value = ""
-    get_matches(True)
-    mock_print.assert_called_with(
-        "This password has not appeared in any data breaches!"
-    )
-    mock_reqst.assert_called()
-
-    # Test case 3: Password is None
-    mock_getpass.return_value = None
-    get_matches(True)
-    mock_print.assert_called_with(
-        "This password has not appeared in any data breaches!"
-    )
-    mock_reqst.assert_called()
-
-    # Test case 4: Text output is False
-    get_matches(False)
-    mock_print.assert_called_with(0)
-    mock_reqst.assert_called()
+    def test_url_error_exits(self, _):
+        with pytest.raises(SystemExit):
+            reqst("ABCDE")
 
 
-# @patch("passchek.passchek.get_matches")
-# def test_main_with_password(mock_get_matches):
-# mock_get_matches.return_value = None
-# runner = CliRunner()
-# result = runner.invoke(passchek, ["mypassword"])
-# assert result.exit_code == 0
-# assert mock_get_matches.call_count == 1
+# ---------------------------------------------------------------------------
+# pwned_count
+# ---------------------------------------------------------------------------
 
-# @mock.patch('passchek.passchek.open_prompt_dialog', return_value='password123')
-# @mock.patch('passchek.passchek.get_matches', return_value=None)
-# @mock.patch('builtins.print')
-# def test_main(mock_print, mock_get_matches, mock_open_prompt_dialog):
-# # Test case when password is provided and no matches are found
-# main(args=['password123'])
-# mock_open_prompt_dialog.assert_not_called()
-# mock_get_matches.assert_called_once_with('password123')
-# mock_print.assert_called_once_with('This password has not appeared in any data breaches!')
+MOCK_BODY = (
+    "0018A45C4D1DEF81644B54AB7F969B88D65:3\r\n"
+    "1E4C9B93F3F0682250B6CF8331B7EE68FD8:7\r\n"   # suffix for "password"
+    "011053FD0102E94D6AE2F8B83D76FAF94F6:1\r\n"
+)
 
-# # Test case when password is provided and matches are found
-# mock_get_matches.return_value = 5
-# main(args=['password123'])
-# mock_get_matches.assert_called_with('password123')
-# mock_print.assert_called_with('This password has appeared 5 times in data breaches.')
+class TestPwnedCount:
+    @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
+    def test_found_returns_count(self, mockreqst):
+        assert pwned_count("password") == 7
+        mockreqst.assert_called_once_with("5BAA6")
 
-# # Test case when no password is provided and no matches are found
-# mock_get_matches.return_value = None
-# main(args=[])
-# mock_open_prompt_dialog.assert_called_once()
-# mock_get_matches.assert_called_once_with()
-# mock_print.assert_called_once_with('This password has not appeared in any data breaches!')
+    @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
+    def test_not_found_returns_zero(self, mockreqst):
+        assert pwned_count("correct horse battery staple") == 0
 
-# # Test case when no password is provided and matches are found
-# mock_get_matches.return_value = 10
-# main(args=[])
-# mock_get_matches.assert_called_with()
-# mock_print.assert_called_with('This password has appeared 10 times in data breaches.')
+    @patch("passchek.passchek.reqst", return_value="")
+    def test_empty_response_returns_zero(self, _):
+        assert pwned_count("anything") == 0
+
+    @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
+    def test_callsreqst_with_correct_prefix(self, mockreqst):
+        pwned_count("qwerty")
+        mockreqst.assert_called_once_with("B1B37")
+
+    @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
+    def test_empty_password(self, _):
+        # Must not raise; result is 0 (empty string not in mock body)
+        assert pwned_count("") == 0
+
+
+# ---------------------------------------------------------------------------
+# get_matches
+# ---------------------------------------------------------------------------
+
+class TestReport:
+    @patch("passchek.passchek.pwned_count", return_value=5)
+    @patch("builtins.print")
+    def test_prose_found(self, mock_print, _):
+        get_matches("password", count_only=False)
+        mock_print.assert_called_once_with(
+            "This password has appeared 5 times in data breaches."
+        )
+
+    @patch("passchek.passchek.pwned_count", return_value=0)
+    @patch("builtins.print")
+    def test_prose_not_found(self, mock_print, _):
+        get_matches("safe_password", count_only=False)
+        mock_print.assert_called_once_with(
+            "This password has not appeared in any data breaches!"
+        )
+
+    @patch("passchek.passchek.pwned_count", return_value=42)
+    @patch("builtins.print")
+    def test_count_only_found(self, mock_print, _):
+        get_matches("password", count_only=True)
+        mock_print.assert_called_once_with(42)
+
+    @patch("passchek.passchek.pwned_count", return_value=0)
+    @patch("builtins.print")
+    def test_count_only_not_found(self, mock_print, _):
+        get_matches("safe", count_only=True)
+        mock_print.assert_called_once_with(0)
+
+
+# ---------------------------------------------------------------------------
+# usage
+# ---------------------------------------------------------------------------
+
+class TestUsage:
+    @patch("builtins.print")
+    def test_contains_version(self, mock_print):
+        usage()
+        output = mock_print.call_args[0][0]
+        assert __version__ in output
+
+    @patch("builtins.print")
+    def test_contains_all_flags(self, mock_print):
+        usage()
+        output = mock_print.call_args[0][0]
+        for flag in ("-h", "-n", "-p", "-s", "-v"):
+            assert flag in output
+
+
+# ---------------------------------------------------------------------------
+# main — option parsing
+# ---------------------------------------------------------------------------
+
+class TestMain:
+    # -h / --help
+    @patch("builtins.print")
+    def test_help_short(self, mock_print):
+        with patch("sys.argv", ["passchek", "-h"]):
+            main()
+        output = mock_print.call_args[0][0]
+        assert __version__ in output
+
+    @patch("builtins.print")
+    def test_help_long(self, mock_print):
+        with patch("sys.argv", ["passchek", "--help"]):
+            main()
+        output = mock_print.call_args[0][0]
+        assert __version__ in output
+
+    # -v / --version
+    @patch("builtins.print")
+    def test_version_short(self, mock_print):
+        with patch("sys.argv", ["passchek", "-v"]):
+            main()
+        mock_print.assert_called_once_with(f"passchek {__version__}")
+
+    @patch("builtins.print")
+    def test_version_long(self, mock_print):
+        with patch("sys.argv", ["passchek", "--version"]):
+            main()
+        mock_print.assert_called_once_with(f"passchek {__version__}")
+
+    # unknown option
+    def test_unknown_option_exits(self):
+        with patch("sys.argv", ["passchek", "--unknown"]):
+            with pytest.raises(SystemExit):
+                main()
+
+    # -s / --sha1 with argument
+    @patch("builtins.print")
+    def test_sha1_with_arg(self, mock_print):
+        with patch("sys.argv", ["passchek", "-s", "password"]):
+            main()
+        mock_print.assert_called_once_with("5BAA6", "1E4C9B93F3F0682250B6CF8331B7EE68FD8")
+
+    @patch("builtins.print")
+    def test_sha1_long_with_arg(self, mock_print):
+        with patch("sys.argv", ["passchek", "--sha1", "qwerty"]):
+            main()
+        mock_print.assert_called_once_with("B1B37", "73A05C0ED0176787A4F1574FF0075F7521E")
+
+    @patch("builtins.print")
+    def test_sha1_multiple_args(self, mock_print):
+        with patch("sys.argv", ["passchek", "-s", "password", "qwerty"]):
+            main()
+        assert mock_print.call_count == 2
+        mock_print.assert_any_call("5BAA6", "1E4C9B93F3F0682250B6CF8331B7EE68FD8")
+        mock_print.assert_any_call("B1B37", "73A05C0ED0176787A4F1574FF0075F7521E")
+
+    # -s with --pipe
+    @patch("builtins.print")
+    def test_sha1_pipe(self, mock_print):
+        stdin_lines = "password\nqwerty\n"
+        with patch("sys.argv", ["passchek", "-s", "-p"]):
+            with patch("sys.stdin", iter(stdin_lines.splitlines(keepends=True))):
+                main()
+        assert mock_print.call_count == 2
+
+    # -s interactive (no args, no pipe)
+    @patch("passchek.passchek.getpass.getpass", return_value="password")
+    @patch("builtins.print")
+    def test_sha1_interactive(self, mock_print, _):
+        with patch("sys.argv", ["passchek", "-s"]):
+            main()
+        mock_print.assert_called_once_with("5BAA6", "1E4C9B93F3F0682250B6CF8331B7EE68FD8")
+
+    # password as argument
+    @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
+    @patch("builtins.print")
+    def test_password_arg(self, mock_print, _):
+        with patch("sys.argv", ["passchek", "password"]):
+            main()
+        mock_print.assert_called_once_with(
+            "This password has appeared 7 times in data breaches."
+        )
+
+    # multiple password arguments
+    @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
+    @patch("builtins.print")
+    def test_multiple_password_args(self, mock_print, _):
+        with patch("sys.argv", ["passchek", "password", "qwerty"]):
+            main()
+        assert mock_print.call_count == 2
+
+    # -n / --num-only with argument
+    @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
+    @patch("builtins.print")
+    def test_num_only_short(self, mock_print, _):
+        with patch("sys.argv", ["passchek", "-n", "password"]):
+            main()
+        mock_print.assert_called_once_with(7)
+
+    @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
+    @patch("builtins.print")
+    def test_num_only_long(self, mock_print, _):
+        with patch("sys.argv", ["passchek", "--num-only", "password"]):
+            main()
+        mock_print.assert_called_once_with(7)
+
+    # -p / --pipe
+    @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
+    @patch("builtins.print")
+    def test_pipe_short(self, mock_print, _):
+        stdin_lines = "password\nqwerty\n"
+        with patch("sys.argv", ["passchek", "-p"]):
+            with patch("sys.stdin", iter(stdin_lines.splitlines(keepends=True))):
+                main()
+        assert mock_print.call_count == 2
+
+    @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
+    @patch("builtins.print")
+    def test_pipe_long(self, mock_print, _):
+        stdin_lines = "password\n"
+        with patch("sys.argv", ["passchek", "--pipe"]):
+            with patch("sys.stdin", iter(stdin_lines.splitlines(keepends=True))):
+                main()
+        mock_print.assert_called_once_with(
+            "This password has appeared 7 times in data breaches."
+        )
+
+    # -p combined with -n
+    @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
+    @patch("builtins.print")
+    def test_pipe_and_num_only(self, mock_print, _):
+        with patch("sys.argv", ["passchek", "-p", "-n"]):
+            with patch("sys.stdin", iter(["password\n"])):
+                main()
+        mock_print.assert_called_once_with(7)
+
+    # interactive prompt (no args, no pipe)
+    @patch("passchek.passchek.getpass.getpass", return_value="password")
+    @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
+    @patch("builtins.print")
+    def test_interactive_prompt(self, mock_print, _, mock_getpass):
+        with patch("sys.argv", ["passchek"]):
+            main()
+        mock_getpass.assert_called_once()
+        mock_print.assert_called_once_with(
+            "This password has appeared 7 times in data breaches."
+        )
+
+    # pipe preserves leading/trailing spaces in password (rstrip("\n") not strip())
+    @patch("passchek.passchek.reqst", return_value="")
+    @patch("builtins.print")
+    def test_pipe_preserves_spaces(self, _, mockreqst):
+        with patch("sys.argv", ["passchek", "-p"]):
+            with patch("sys.stdin", iter([" password \n"])):
+                main()
+        called_prefix = mockreqst.call_args[0][0]
+        expected_prefix, _ = hash_password(" password ")
+        assert called_prefix == expected_prefix
