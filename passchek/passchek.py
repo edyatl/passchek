@@ -125,8 +125,8 @@ def handle_sha1_option(text_output: bool, use_in_pipe: bool, args: list[str]) ->
         print(result if text_output else " ".join(result))
 
     if args:
-        for arg in args:
-            emit(arg)
+        for pw in args:
+            emit(pw)
         sys.exit()
 
     if use_in_pipe:
