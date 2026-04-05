@@ -117,28 +117,6 @@ def get_matches(text_output: bool = True, pw: str | None = None) -> None:
         print(matches)
 
 
-def handle_sha1_option(text_output: bool, use_in_pipe: bool, args: list[str]) -> None:
-    """Handle the --sha1 option."""
-
-    def emit(pw: str) -> None:
-        result = hash_password(pw)
-        print(result if text_output else " ".join(result))
-
-    if args:
-        for pw in args:
-            emit(pw)
-        sys.exit()
-
-    if use_in_pipe:
-        for line in sys.stdin:
-            emit(line.strip())
-        sys.exit()
-
-    pw = getpass.getpass("Enter password: ")
-    emit(pw)
-    sys.exit()
-
-
 def parse_cli(argv: list[str]) -> tuple[bool, bool, bool, list[str]]:
     """Parse command-line arguments into structured options."""
     try:
@@ -177,7 +155,22 @@ def main() -> None:
 
     # Handle --sha1 option
     if sha1_output:
-        handle_sha1_option(text_output, use_in_pipe, args)
+        if args:
+            for pw in args:
+                result = hash_password(pw)
+                print(result if text_output else " ".join(result))
+            sys.exit()
+
+        if use_in_pipe:
+            for line in sys.stdin:
+                result = hash_password(line.strip())
+                print(result if text_output else " ".join(result))
+            sys.exit()
+
+        pw = getpass.getpass("Enter password: ")
+        result = hash_password(pw)
+        print(result if text_output else " ".join(result))
+        sys.exit()
 
     # Handle password(s) arguments
     if args:
