@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import pytest
+import urllib.error
 import unittest.mock as mock
 from unittest.mock import patch, MagicMock, call
 from passchek.passchek import (
@@ -51,53 +52,70 @@ class TestHashPassword:
 # reqst
 # ---------------------------------------------------------------------------
 
-class TestFetch:
+class TestReqst:
     @patch("passchek.passchek.urllib.request.urlopen")
     def test_returns_decoded_body(self, mock_urlopen):
-        body = b"0018A45C4D1DEF81644B54AB7F969B88D65:1\r\n00D4F6E8FA6EECAD2A3AA415EEC418D38EC:2\r\n"
-        cm = MagicMock()
-        cm.read.return_value = body
-        cm.__enter__.return_value = cm
-        mock_urlopen.return_value = cm
+        body = (
+            b"0018A45C4D1DEF81644B54AB7F969B88D65:1\r\n"
+            b"00D4F6E8FA6EECAD2A3AA415EEC418D38EC:2\r\n"
+        )
+        response = MagicMock()
+        response.read.return_value = body
+        mock_urlopen.return_value.__enter__.return_value = response
 
         result = reqst("0018A")
+
         assert result == body.decode("utf-8-sig")
         mock_urlopen.assert_called_once()
 
     @patch("passchek.passchek.urllib.request.urlopen")
     def test_request_url_contains_prefix(self, mock_urlopen):
-        cm = MagicMock()
-        cm.read.return_value = b""
-        cm.__enter__.return_value = cm
-        mock_urlopen.return_value = cm
+        response = MagicMock()
+        response.read.return_value = b""
+        mock_urlopen.return_value.__enter__.return_value = response
 
         reqst("ABCDE")
-        url_used = mock_urlopen.call_args[0][0].full_url
-        assert "ABCDE" in url_used
+
+        request = mock_urlopen.call_args.args[0]
+        assert request.full_url.endswith("ABCDE")
 
     @patch("passchek.passchek.urllib.request.urlopen")
-    def test_request_includes_padding_header(self, mock_urlopen):
-        cm = MagicMock()
-        cm.read.return_value = b""
-        cm.__enter__.return_value = cm
-        mock_urlopen.return_value = cm
+    def test_request_includes_required_headers(self, mock_urlopen):
+        response = MagicMock()
+        response.read.return_value = b""
+        mock_urlopen.return_value.__enter__.return_value = response
 
         reqst("ABCDE")
-        req = mock_urlopen.call_args[0][0]
-        assert req.get_header("Add-padding") == "true"
 
-    @patch("passchek.passchek.urllib.request.urlopen", side_effect=Exception("timeout"))
-    def test_network_error_exits(self, _):
-        with pytest.raises(SystemExit):
-            reqst("ABCDE")
+        request = mock_urlopen.call_args.args[0]
+        assert request.get_header("Add-Padding") == "true"
+        assert request.get_header("User-agent").startswith("passchek ")
 
     @patch(
         "passchek.passchek.urllib.request.urlopen",
-        side_effect=__import__("urllib").error.URLError("unreachable"),
+        side_effect=urllib.error.URLError("unreachable"),
     )
-    def test_url_error_exits(self, _):
-        with pytest.raises(SystemExit):
+    def test_url_error_exits_with_code_1(self, _):
+        with pytest.raises(SystemExit) as exc:
             reqst("ABCDE")
+
+        assert exc.value.code == 1
+
+    @patch(
+        "passchek.passchek.urllib.request.urlopen",
+        side_effect=urllib.error.HTTPError(
+            url="https://api.pwnedpasswords.com/range/ABCDE",
+            code=500,
+            msg="Server Error",
+            hdrs=None,
+            fp=None,
+        ),
+    )
+    def test_http_error_exits_with_code_1(self, _):
+        with pytest.raises(SystemExit) as exc:
+            reqst("ABCDE")
+
+        assert exc.value.code == 1
 
 
 # ---------------------------------------------------------------------------
