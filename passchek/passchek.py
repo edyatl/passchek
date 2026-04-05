@@ -81,14 +81,14 @@ def reqst(prefix: str) -> str:
         sys.exit(1)
 
 
-def pwned_count(password: str) -> int:
-    """Return how many times *password* appears in breach data (0 = not found).
+def pwned_count(pw: str | None) -> int:
+    """Return how many times *pw* appears in breach data (0 = not found).
 
-    :param passwrd: password in raw format
+    :param pw: password in raw format
     :return: count of matches
     """
-    if password:
-        prefix, suffix = hash_password(password)
+    if pw:
+        prefix, suffix = hash_password(pw)
     else:
         prefix, suffix = open_prompt_dialog()
 
@@ -99,13 +99,13 @@ def pwned_count(password: str) -> int:
     return 0
 
 
-def get_matches(text_output: bool = True, passwrd: str | None = None) -> None:
+def get_matches(text_output: bool = True, pw: str | None = None) -> None:
     """Print the number of pwned-password matches.
 
     :param text_output: Whether to print a human-readable message.
-    :param passwrd: Password in raw format.
+    :param pw: Password in raw format.
     """
-    matches = pwned_count(passwrd)
+    matches = pwned_count(pw)
 
     if text_output:
         print(
@@ -120,8 +120,8 @@ def get_matches(text_output: bool = True, passwrd: str | None = None) -> None:
 def handle_sha1_option(text_output: bool, use_in_pipe: bool, args: list[str]) -> None:
     """Handle the --sha1 option."""
 
-    def emit(password: str) -> None:
-        result = hash_password(password)
+    def emit(pw: str) -> None:
+        result = hash_password(pw)
         print(result if text_output else " ".join(result))
 
     if args:
@@ -134,7 +134,8 @@ def handle_sha1_option(text_output: bool, use_in_pipe: bool, args: list[str]) ->
             emit(line.strip())
         sys.exit()
 
-    emit(open_prompt_dialog())
+    pw = getpass.getpass("Enter password: ")
+    emit(pw)
     sys.exit()
 
 
