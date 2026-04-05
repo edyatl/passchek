@@ -153,39 +153,29 @@ def main() -> None:
     """Program entry point."""
     text_output, use_in_pipe, sha1_output, args = parse_cli(sys.argv[1:])
 
-    # Handle --sha1 option
     if sha1_output:
         if args:
             for pw in args:
                 result = hash_password(pw)
                 print(result if text_output else " ".join(result))
-            sys.exit()
-
-        if use_in_pipe:
+        elif use_in_pipe:
             for line in sys.stdin:
                 result = hash_password(line.strip())
                 print(result if text_output else " ".join(result))
-            sys.exit()
+        else:
+            pw = getpass.getpass("Enter password: ")
+            result = hash_password(pw)
+            print(result if text_output else " ".join(result))
+        return
 
-        pw = getpass.getpass("Enter password: ")
-        result = hash_password(pw)
-        print(result if text_output else " ".join(result))
-        sys.exit()
-
-    # Handle password(s) arguments
     if args:
         for pw in args:
             get_matches(text_output, pw)
-        return
-
-    # Handle piping
-    if use_in_pipe:
+    elif use_in_pipe:
         for line in sys.stdin:
             get_matches(text_output, line.strip())
-        return
-
-    # Prompt user for password
-    get_matches(text_output)
+    else:
+        get_matches(text_output)
 
 
 if __name__ == "__main__":
