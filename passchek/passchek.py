@@ -108,7 +108,7 @@ def get_matches(text_output: bool = True, pw: str | None = None) -> None:
         print(matches)
 
 
-def parse_cli(argv: list[str]) -> tuple[bool, bool, bool, list[str]]:
+def parse_cli(argv: list[str]) -> tuple[bool, bool, bool, list[str], bool]:
     """Parse command-line arguments into structured options."""
     try:
         opts, args = getopt.gnu_getopt(
@@ -117,16 +117,17 @@ def parse_cli(argv: list[str]) -> tuple[bool, bool, bool, list[str]]:
     except getopt.GetoptError as err:
         print(err)
         usage()
-        sys.exit(2)
+        return False, False, False, [], True
 
     text_output: bool = True  # --num-only
     use_in_pipe: bool = False  # --pipe
     sha1_output: bool = False  # --sha1
+    exit_after_parse: bool = False
 
     for opt, _ in opts:
         if opt in ("-h", "--help"):
             usage()
-            sys.exit()
+            exit_after_parse = True
         elif opt in ("-n", "--num-only"):
             text_output = False
         elif opt in ("-p", "--pipe"):
@@ -135,14 +136,23 @@ def parse_cli(argv: list[str]) -> tuple[bool, bool, bool, list[str]]:
             sha1_output = True
         elif opt in ("-v", "--version"):
             print(f"Passchek version: {__version__}")
-            sys.exit()
+            exit_after_parse = True
 
-    return text_output, use_in_pipe, sha1_output, args
+    return text_output, use_in_pipe, sha1_output, args, exit_after_parse
 
 
 def main() -> None:
     """Program entry point."""
-    text_output, use_in_pipe, sha1_output, args = parse_cli(sys.argv[1:])
+    (
+        text_output,
+        use_in_pipe,
+        sha1_output,
+        args,
+        exit_after_parse,
+    ) = parse_cli(sys.argv[1:])
+
+    if exit_after_parse:
+        return
 
     if sha1_output:
         if args:
