@@ -88,8 +88,9 @@ class TestReqst:
         reqst("ABCDE")
 
         request = mock_urlopen.call_args.args[0]
-        assert request.get_header("Add-Padding") == "true"
-        assert request.get_header("User-agent").startswith("passchek ")
+        headers = {k.lower(): v for k, v in request.header_items()}
+        assert headers.get("add-padding") == "true"
+        assert headers.get("user-agent").startswith("passchek ")
 
     @patch(
         "passchek.passchek.urllib.request.urlopen",
@@ -148,9 +149,10 @@ class TestPwnedCount:
         mockreqst.assert_called_once_with("B1B37")
 
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
-    def test_empty_password(self, _):
+    @patch("passchek.passchek.getpass.getpass", return_value="")
+    def test_empty_password(self, mock_getpass, _):
         # Must not raise; result is 0 (empty string not in mock body)
-        assert pwned_count("") == 0
+        assert pwned_count(None) == 0
 
 
 # ---------------------------------------------------------------------------
