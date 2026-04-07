@@ -46,7 +46,7 @@ def hash_password(pw: str | None = None) -> tuple[str, str]:
     :param pw: password in raw format
     :return: tuple (prefix of hash, suffix of hash)
     """
-    pw = pw if pw else ""
+    pw = pw.strip() if pw else ""
     hash_pass = hashlib.sha1(pw.encode("utf-8"), usedforsecurity=True).hexdigest().upper()
     return hash_pass[:5], hash_pass[5:]
 
@@ -117,7 +117,7 @@ def parse_cli(argv: list[str]) -> tuple[bool, bool, bool, list[str], bool]:
     except getopt.GetoptError as err:
         print(err)
         usage()
-        return False, False, False, [], True
+        sys.exit(2)
 
     text_output: bool = True  # --num-only
     use_in_pipe: bool = False  # --pipe
@@ -135,7 +135,7 @@ def parse_cli(argv: list[str]) -> tuple[bool, bool, bool, list[str], bool]:
         elif opt in ("-s", "--sha1"):
             sha1_output = True
         elif opt in ("-v", "--version"):
-            print(f"Passchek version: {__version__}")
+            print(f"Passchek v{__version__}")
             exit_after_parse = True
 
     return text_output, use_in_pipe, sha1_output, args, exit_after_parse
