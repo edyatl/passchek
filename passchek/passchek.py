@@ -27,7 +27,7 @@ _API = "https://api.pwnedpasswords.com/range/"
 
 def usage() -> None:
     """Show usage help screen and exit."""
-    print(f"""Passchek is a simple cli tool, checks if your password has been compromised.
+    print(f"""Passchek v{__version__} - checks if your password has been compromised.
 
 Usage: {os.path.basename(__file__)} [options] [PASSWORD ...]
 
