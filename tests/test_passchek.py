@@ -163,7 +163,7 @@ class TestReport:
     @patch("passchek.passchek.pwned_count", return_value=5)
     @patch("builtins.print")
     def test_prose_found(self, mock_print, _):
-        get_matches("password", count_only=False)
+        get_matches(True, "password")
         mock_print.assert_called_once_with(
             "This password has appeared 5 times in data breaches."
         )
@@ -171,7 +171,7 @@ class TestReport:
     @patch("passchek.passchek.pwned_count", return_value=0)
     @patch("builtins.print")
     def test_prose_not_found(self, mock_print, _):
-        get_matches("safe_password", count_only=False)
+        get_matches(True, "safe_password")
         mock_print.assert_called_once_with(
             "This password has not appeared in any data breaches!"
         )
@@ -179,13 +179,13 @@ class TestReport:
     @patch("passchek.passchek.pwned_count", return_value=42)
     @patch("builtins.print")
     def test_count_only_found(self, mock_print, _):
-        get_matches("password", count_only=True)
+        get_matches(False, "password")
         mock_print.assert_called_once_with(42)
 
     @patch("passchek.passchek.pwned_count", return_value=0)
     @patch("builtins.print")
     def test_count_only_not_found(self, mock_print, _):
-        get_matches("safe", count_only=True)
+        get_matches(False, "safe")
         mock_print.assert_called_once_with(0)
 
 
