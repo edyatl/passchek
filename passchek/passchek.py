@@ -51,15 +51,6 @@ def hash_password(pw: str | None = None) -> tuple[str, str]:
     return hash_pass[:5], hash_pass[5:]
 
 
-def open_prompt_dialog() -> tuple[str, str]:
-    """Open prompt dialog for enter password.
-
-    :return: result tuple of hash_password (prefix of hash, suffix of hash)
-    """
-    pw = getpass.getpass("Enter password: ")
-    return hash_password(pw)
-
-
 def reqst(prefix: str) -> str:
     """Make request to Troy Hunt's pwnedpassword API.
 
@@ -90,7 +81,7 @@ def pwned_count(pw: str | None) -> int:
     if pw:
         prefix, suffix = hash_password(pw)
     else:
-        prefix, suffix = open_prompt_dialog()
+        prefix, suffix = hash_password(getpass.getpass("Enter password: "))
 
     for line in reqst(prefix).splitlines():
         tail, sep, count = line.partition(":")
