@@ -233,13 +233,13 @@ class TestMain:
     def test_version_short(self, mock_print):
         with patch("sys.argv", ["passchek", "-v"]):
             main()
-        mock_print.assert_called_once_with(f"passchek {__version__}")
+        mock_print.assert_called_once_with(f"Passchek v{__version__}")
 
     @patch("builtins.print")
     def test_version_long(self, mock_print):
         with patch("sys.argv", ["passchek", "--version"]):
             main()
-        mock_print.assert_called_once_with(f"passchek {__version__}")
+        mock_print.assert_called_once_with(f"Passchek v{__version__}")
 
     # unknown option
     def test_unknown_option_exits(self):
@@ -252,21 +252,21 @@ class TestMain:
     def test_sha1_with_arg(self, mock_print):
         with patch("sys.argv", ["passchek", "-s", "password"]):
             main()
-        mock_print.assert_called_once_with("5BAA6", "1E4C9B93F3F0682250B6CF8331B7EE68FD8")
+        mock_print.assert_called_once_with(('5BAA6', '1E4C9B93F3F0682250B6CF8331B7EE68FD8'))
 
     @patch("builtins.print")
     def test_sha1_long_with_arg(self, mock_print):
         with patch("sys.argv", ["passchek", "--sha1", "qwerty"]):
             main()
-        mock_print.assert_called_once_with("B1B37", "73A05C0ED0176787A4F1574FF0075F7521E")
+        mock_print.assert_called_once_with(('B1B37', '73A05C0ED0176787A4F1574FF0075F7521E'))
 
     @patch("builtins.print")
     def test_sha1_multiple_args(self, mock_print):
         with patch("sys.argv", ["passchek", "-s", "password", "qwerty"]):
             main()
         assert mock_print.call_count == 2
-        mock_print.assert_any_call("5BAA6", "1E4C9B93F3F0682250B6CF8331B7EE68FD8")
-        mock_print.assert_any_call("B1B37", "73A05C0ED0176787A4F1574FF0075F7521E")
+        mock_print.assert_any_call(("5BAA6", "1E4C9B93F3F0682250B6CF8331B7EE68FD8"))
+        mock_print.assert_any_call(("B1B37", "73A05C0ED0176787A4F1574FF0075F7521E"))
 
     # -s with --pipe
     @patch("builtins.print")
@@ -283,7 +283,7 @@ class TestMain:
     def test_sha1_interactive(self, mock_print, _):
         with patch("sys.argv", ["passchek", "-s"]):
             main()
-        mock_print.assert_called_once_with("5BAA6", "1E4C9B93F3F0682250B6CF8331B7EE68FD8")
+        mock_print.assert_called_once_with(("5BAA6", "1E4C9B93F3F0682250B6CF8331B7EE68FD8"))
 
     # password as argument
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
