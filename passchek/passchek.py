@@ -68,7 +68,8 @@ def reqst(prefix: str) -> str:
     )
     try:
         with urllib.request.urlopen(req) as res:
-            return res.read().decode("utf-8-sig")
+            raw: bytes = res.read()
+            return raw.decode("utf-8-sig")
     except (urllib.error.HTTPError, urllib.error.URLError) as err:
         print(f"Exception found: {err}")
         sys.exit(1)
