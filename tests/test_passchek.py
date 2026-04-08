@@ -121,7 +121,7 @@ class TestReqst:
         "passchek.passchek.urllib.request.urlopen",
         side_effect=urllib.error.URLError("unreachable"),
     )
-    def test_url_error_exits_with_code_1(self, _) -> None:
+    def test_url_error_exits_with_code_1(self, _: MagicMock) -> None:
         with pytest.raises(SystemExit) as exc:
             reqst("ABCDE")
 
@@ -137,7 +137,7 @@ class TestReqst:
             fp=None,
         ),
     )
-    def test_http_error_exits_with_code_1(self, _) -> None:
+    def test_http_error_exits_with_code_1(self, _: MagicMock) -> None:
         with pytest.raises(SystemExit) as exc:
             reqst("ABCDE")
 
@@ -162,7 +162,7 @@ class TestPwnedCount:
         assert pwned_count("correct horse battery staple") == 0
 
     @patch("passchek.passchek.reqst", return_value="")
-    def test_empty_response_returns_zero(self, _) -> None:
+    def test_empty_response_returns_zero(self, _: MagicMock) -> None:
         assert pwned_count("anything") == 0
 
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
@@ -172,7 +172,7 @@ class TestPwnedCount:
 
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
     @patch("passchek.passchek.getpass.getpass", return_value="")
-    def test_empty_password(self, mock_getpass: MagicMock, _) -> None:
+    def test_empty_password(self, mock_getpass: MagicMock, _: MagicMock) -> None:
         # Must not raise; result is 0 (empty string not in mock body)
         assert pwned_count(None) == 0
 
@@ -187,7 +187,7 @@ class TestReport:
 
     @patch("passchek.passchek.pwned_count", return_value=5)
     @patch("builtins.print")
-    def test_prose_found(self, mock_print: MagicMock, _) -> None:
+    def test_prose_found(self, mock_print: MagicMock, _: MagicMock) -> None:
         get_matches(True, "password")
         mock_print.assert_called_once_with(
             "This password has appeared 5 times in data breaches."
@@ -195,7 +195,7 @@ class TestReport:
 
     @patch("passchek.passchek.pwned_count", return_value=0)
     @patch("builtins.print")
-    def test_prose_not_found(self, mock_print: MagicMock, _) -> None:
+    def test_prose_not_found(self, mock_print: MagicMock, _: MagicMock) -> None:
         get_matches(True, "safe_password")
         mock_print.assert_called_once_with(
             "This password has not appeared in any data breaches!"
@@ -203,13 +203,13 @@ class TestReport:
 
     @patch("passchek.passchek.pwned_count", return_value=42)
     @patch("builtins.print")
-    def test_count_only_found(self, mock_print: MagicMock, _) -> None:
+    def test_count_only_found(self, mock_print: MagicMock, _: MagicMock) -> None:
         get_matches(False, "password")
         mock_print.assert_called_once_with(42)
 
     @patch("passchek.passchek.pwned_count", return_value=0)
     @patch("builtins.print")
-    def test_count_only_not_found(self, mock_print: MagicMock, _) -> None:
+    def test_count_only_not_found(self, mock_print: MagicMock, _: MagicMock) -> None:
         get_matches(False, "safe")
         mock_print.assert_called_once_with(0)
 
@@ -312,7 +312,7 @@ class TestMain:
     # -s interactive (no args, no pipe)
     @patch("passchek.passchek.getpass.getpass", return_value="password")
     @patch("builtins.print")
-    def test_sha1_interactive(self, mock_print: MagicMock, _) -> None:
+    def test_sha1_interactive(self, mock_print: MagicMock, _: MagicMock) -> None:
         with patch("sys.argv", ["passchek", "-s"]):
             main()
         mock_print.assert_called_once_with(KNOWN_PASSWORDS["password"])
@@ -320,7 +320,7 @@ class TestMain:
     # password as argument
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
     @patch("builtins.print")
-    def test_password_arg(self, mock_print: MagicMock, _) -> None:
+    def test_password_arg(self, mock_print: MagicMock, _: MagicMock) -> None:
         with patch("sys.argv", ["passchek", "password"]):
             main()
         mock_print.assert_called_once_with(
@@ -330,7 +330,7 @@ class TestMain:
     # multiple password arguments
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
     @patch("builtins.print")
-    def test_multiple_password_args(self, mock_print: MagicMock, _) -> None:
+    def test_multiple_password_args(self, mock_print: MagicMock, _: MagicMock) -> None:
         with patch("sys.argv", ["passchek", "password", "qwerty"]):
             main()
         assert mock_print.call_count == NUMBER[2]
@@ -338,14 +338,14 @@ class TestMain:
     # -n / --num-only with argument
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
     @patch("builtins.print")
-    def test_num_only_short(self, mock_print: MagicMock, _) -> None:
+    def test_num_only_short(self, mock_print: MagicMock, _: MagicMock) -> None:
         with patch("sys.argv", ["passchek", "-n", "password"]):
             main()
         mock_print.assert_called_once_with(7)
 
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
     @patch("builtins.print")
-    def test_num_only_long(self, mock_print: MagicMock, _) -> None:
+    def test_num_only_long(self, mock_print: MagicMock, _: MagicMock) -> None:
         with patch("sys.argv", ["passchek", "--num-only", "password"]):
             main()
         mock_print.assert_called_once_with(7)
@@ -353,7 +353,7 @@ class TestMain:
     # -p / --pipe
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
     @patch("builtins.print")
-    def test_pipe_short(self, mock_print: MagicMock, _) -> None:
+    def test_pipe_short(self, mock_print: MagicMock, _: MagicMock) -> None:
         stdin_lines = "password\nqwerty\n"
         with (
             patch("sys.argv", ["passchek", "-p"]),
@@ -364,7 +364,7 @@ class TestMain:
 
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
     @patch("builtins.print")
-    def test_pipe_long(self, mock_print: MagicMock, _) -> None:
+    def test_pipe_long(self, mock_print: MagicMock, _: MagicMock) -> None:
         stdin_lines = "password\n"
         with (
             patch("sys.argv", ["passchek", "--pipe"]),
@@ -378,7 +378,7 @@ class TestMain:
     # -p combined with -n
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
     @patch("builtins.print")
-    def test_pipe_and_num_only(self, mock_print: MagicMock, _) -> None:
+    def test_pipe_and_num_only(self, mock_print: MagicMock, _: MagicMock) -> None:
         with (
             patch("sys.argv", ["passchek", "-p", "-n"]),
             patch("sys.stdin", iter(["password\n"])),
@@ -391,7 +391,7 @@ class TestMain:
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
     @patch("builtins.print")
     def test_interactive_prompt(
-        self, mock_print: MagicMock, _, mock_getpass: MagicMock
+        self, mock_print: MagicMock, _: MagicMock, mock_getpass: MagicMock
     ) -> None:
         with patch("sys.argv", ["passchek"]):
             main()
@@ -403,7 +403,7 @@ class TestMain:
     # pipe preserves leading/trailing spaces in password (rstrip("\n") not strip())
     @patch("passchek.passchek.reqst", return_value="")
     @patch("builtins.print")
-    def test_pipe_preserves_spaces(self, _, mockreqst: MagicMock) -> None:
+    def test_pipe_preserves_spaces(self, _: str, mockreqst: MagicMock) -> None:
         with (
             patch("sys.argv", ["passchek", "-p"]),
             patch("sys.stdin", iter([" password \n"])),
