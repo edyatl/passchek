@@ -3,7 +3,7 @@ import setuptools
 
 from passchek.passchek import __version__
 
-with open("README.md", "r") as fh:
+with open("README.md") as fh:
     long_description = fh.read()
 
 setuptools.setup(
@@ -12,7 +12,7 @@ setuptools.setup(
     license="MIT",
     author="Yevgeny Dyatlov",
     author_email="edyatl@yandex.ru",
-    description="Passchek is a simple cli tool, checks if your password has been compromised.",
+    description="Simple cli tool, checks if your password has been compromised.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/edyatl/passchek",
@@ -39,13 +39,13 @@ setuptools.setup(
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.14",
         "Environment :: Console",
         "License :: OSI Approved :: MIT License",
         "Operating System :: POSIX",
         "Intended Audience :: End Users/Desktop",
         "Topic :: Utilities",
     ],
-    python_requires=">=3.5",
+    python_requires=">=3.9",
 )

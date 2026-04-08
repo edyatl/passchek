@@ -1,28 +1,34 @@
 #!/usr/bin/env python3
-import sys
-import pytest
 import urllib.error
-import unittest.mock as mock
-from unittest.mock import patch, MagicMock, call
+from unittest.mock import MagicMock, patch
+
+import pytest
+
 from passchek.passchek import (
+    __version__,
+    get_matches,
     hash_password,
+    main,
     pwned_count,
     reqst,
-    get_matches,
     usage,
-    main,
-    __version__,
 )
-
 
 # ---------------------------------------------------------------------------
 # hash_password
 # ---------------------------------------------------------------------------
 
+
 class TestHashPassword:
     def test_known_vectors(self):
-        assert hash_password("qwerty") == ("B1B37", "73A05C0ED0176787A4F1574FF0075F7521E")
-        assert hash_password("password") == ("5BAA6", "1E4C9B93F3F0682250B6CF8331B7EE68FD8")
+        assert hash_password("qwerty") == (
+            "B1B37",
+            "73A05C0ED0176787A4F1574FF0075F7521E",
+        )
+        assert hash_password("password") == (
+            "5BAA6",
+            "1E4C9B93F3F0682250B6CF8331B7EE68FD8",
+        )
         assert hash_password("1234") == ("7110E", "DA4D09E062AA5E4A390B0A572AC0D2C0220")
 
     def test_empty_string(self):
@@ -51,6 +57,7 @@ class TestHashPassword:
 # ---------------------------------------------------------------------------
 # reqst
 # ---------------------------------------------------------------------------
+
 
 class TestReqst:
     @patch("passchek.passchek.urllib.request.urlopen")
@@ -125,9 +132,10 @@ class TestReqst:
 
 MOCK_BODY = (
     "0018A45C4D1DEF81644B54AB7F969B88D65:3\r\n"
-    "1E4C9B93F3F0682250B6CF8331B7EE68FD8:7\r\n"   # suffix for "password"
+    "1E4C9B93F3F0682250B6CF8331B7EE68FD8:7\r\n"  # suffix for "password"
     "011053FD0102E94D6AE2F8B83D76FAF94F6:1\r\n"
 )
+
 
 class TestPwnedCount:
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
@@ -158,6 +166,7 @@ class TestPwnedCount:
 # ---------------------------------------------------------------------------
 # get_matches
 # ---------------------------------------------------------------------------
+
 
 class TestReport:
     @patch("passchek.passchek.pwned_count", return_value=5)
@@ -193,6 +202,7 @@ class TestReport:
 # usage
 # ---------------------------------------------------------------------------
 
+
 class TestUsage:
     @patch("builtins.print")
     def test_contains_version(self, mock_print):
@@ -211,6 +221,7 @@ class TestUsage:
 # ---------------------------------------------------------------------------
 # main — option parsing
 # ---------------------------------------------------------------------------
+
 
 class TestMain:
     # -h / --help
@@ -252,13 +263,17 @@ class TestMain:
     def test_sha1_with_arg(self, mock_print):
         with patch("sys.argv", ["passchek", "-s", "password"]):
             main()
-        mock_print.assert_called_once_with(('5BAA6', '1E4C9B93F3F0682250B6CF8331B7EE68FD8'))
+        mock_print.assert_called_once_with(
+            ("5BAA6", "1E4C9B93F3F0682250B6CF8331B7EE68FD8")
+        )
 
     @patch("builtins.print")
     def test_sha1_long_with_arg(self, mock_print):
         with patch("sys.argv", ["passchek", "--sha1", "qwerty"]):
             main()
-        mock_print.assert_called_once_with(('B1B37', '73A05C0ED0176787A4F1574FF0075F7521E'))
+        mock_print.assert_called_once_with(
+            ("B1B37", "73A05C0ED0176787A4F1574FF0075F7521E")
+        )
 
     @patch("builtins.print")
     def test_sha1_multiple_args(self, mock_print):
@@ -283,7 +298,9 @@ class TestMain:
     def test_sha1_interactive(self, mock_print, _):
         with patch("sys.argv", ["passchek", "-s"]):
             main()
-        mock_print.assert_called_once_with(("5BAA6", "1E4C9B93F3F0682250B6CF8331B7EE68FD8"))
+        mock_print.assert_called_once_with(
+            ("5BAA6", "1E4C9B93F3F0682250B6CF8331B7EE68FD8")
+        )
 
     # password as argument
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)

@@ -11,14 +11,14 @@ Developed by @edyatl <edyatl@yandex.ru> April 2026
 https://github.com/edyatl
 
 """
-import os
+
+import getopt
 import getpass
+import hashlib
+import os
+import sys
 import urllib.error
 import urllib.request
-import sys
-import hashlib
-import getopt
-
 
 __version__ = "0.2.3"
 
@@ -47,7 +47,9 @@ def hash_password(pw: str | None = None) -> tuple[str, str]:
     :return: tuple (prefix of hash, suffix of hash)
     """
     pw = pw.strip() if pw else ""
-    hash_pass = hashlib.sha1(pw.encode("utf-8"), usedforsecurity=True).hexdigest().upper()
+    hash_pass = (
+        hashlib.sha1(pw.encode("utf-8"), usedforsecurity=True).hexdigest().upper()
+    )
     return hash_pass[:5], hash_pass[5:]
 
 
