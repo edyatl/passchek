@@ -59,7 +59,6 @@ dev = [
 test = [
     "pytest>=8",
     "pytest-cov>=5",
-    "responses>=0.25",   # for mocking HTTP calls
 ]
 
 # ---------------------------------------------
