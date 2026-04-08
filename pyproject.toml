@@ -35,6 +35,7 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
+    "urllib3",  # Not actually needed since we use urllib
 ]
 
 [project.urls]
