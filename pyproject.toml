@@ -35,7 +35,6 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
-    "requests>=2.31",    # adjust to your actual runtime deps
 ]
 
 [project.urls]
