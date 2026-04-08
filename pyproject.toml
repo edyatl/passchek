@@ -1,0 +1,29 @@
+[tool.ruff]
+line-length = 88          # PEP 8 default
+target-version = "py312" 
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle (PEP 8)
+    "F",      # pyflakes
+    "I",      # isort (import sorting)
+    "D",      # pydocstyle (PEP 257 docstrings)
+    "UP",     # pyupgrade (modern Python syntax)
+    "B",      # flake8-bugbear (common bugs)
+    "SIM",    # flake8-simplify (reduce clutter, more readable)
+    "PL",     # pylint compatibility (optional — keeps some of your old pylint strictness)
+    "RUF",    # Ruff-specific rules (extra polish)
+]
+ignore = ["D203", "D213"]  # Common docstring convention tweaks
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+
+[tool.ruff.format]
+quote-style = "double" 
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true 
