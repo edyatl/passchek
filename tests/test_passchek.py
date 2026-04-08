@@ -3,6 +3,7 @@
 Module for testing the passchek module.
 """
 
+import http.client
 import urllib.error
 from unittest.mock import MagicMock, patch
 
@@ -18,6 +19,19 @@ from passchek.passchek import (
     usage,
 )
 
+# Constants
+KNOWN_PASSWORDS = {
+    "qwerty": ("B1B37", "73A05C0ED0176787A4F1574FF0075F7521E"),
+    "password": ("5BAA6", "1E4C9B93F3F0682250B6CF8331B7EE68FD8"),
+    "1234": ("7110E", "DA4D09E062AA5E4A390B0A572AC0D2C0220"),
+}
+
+MOCK_BODY = (
+    "0018A45C4D1DEF81644B54AB7F969B88D65:3\r\n"
+    "1E4C9B93F3F0682250B6CF8331B7EE68FD8:7\r\n"  # suffix for "password"
+    "011053FD0102E94D6AE2F8B83D76FAF94F6:1\r\n"
+)
+
 # ---------------------------------------------------------------------------
 # hash_password
 # ---------------------------------------------------------------------------
@@ -27,15 +41,8 @@ class TestHashPassword:
     """Class for testing the hash_password function."""
 
     def test_known_vectors(self) -> None:
-        assert hash_password("qwerty") == (
-            "B1B37",
-            "73A05C0ED0176787A4F1574FF0075F7521E",
-        )
-        assert hash_password("password") == (
-            "5BAA6",
-            "1E4C9B93F3F0682250B6CF8331B7EE68FD8",
-        )
-        assert hash_password("1234") == ("7110E", "DA4D09E062AA5E4A390B0A572AC0D2C0220")
+        for password, expected_hash in KNOWN_PASSWORDS.items():
+            assert hash_password(password) == expected_hash
 
     def test_empty_string(self) -> None:
         prefix, suffix = hash_password("")
@@ -105,7 +112,8 @@ class TestReqst:
         request = mock_urlopen.call_args.args[0]
         headers = {k.lower(): v for k, v in request.header_items()}
         assert headers.get("add-padding") == "true"
-        assert headers.get("user-agent").startswith("passchek ")
+        user_agent = headers.get("user-agent")
+        assert user_agent is not None and user_agent.startswith("passchek ")
 
     @patch(
         "passchek.passchek.urllib.request.urlopen",
@@ -123,7 +131,7 @@ class TestReqst:
             url="https://api.pwnedpasswords.com/range/ABCDE",
             code=500,
             msg="Server Error",
-            hdrs=None,
+            hdrs=http.client.HTTPMessage(),
             fp=None,
         ),
     )
@@ -137,13 +145,6 @@ class TestReqst:
 # ---------------------------------------------------------------------------
 # pwned_count
 # ---------------------------------------------------------------------------
-
-MOCK_BODY = (
-    "0018A45C4D1DEF81644B54AB7F969B88D65:3\r\n"
-    "1E4C9B93F3F0682250B6CF8331B7EE68FD8:7\r\n"  # suffix for "password"
-    "011053FD0102E94D6AE2F8B83D76FAF94F6:1\r\n"
-)
-
 
 class TestPwnedCount:
     """Class for testing the pwned_count function."""
@@ -279,7 +280,7 @@ class TestMain:
         with patch("sys.argv", ["passchek", "-s", "password"]):
             main()
         mock_print.assert_called_once_with(
-            ("5BAA6", "1E4C9B93F3F0682250B6CF8331B7EE68FD8")
+            KNOWN_PASSWORDS["password"]
         )
 
     @patch("builtins.print")
@@ -287,7 +288,7 @@ class TestMain:
         with patch("sys.argv", ["passchek", "--sha1", "qwerty"]):
             main()
         mock_print.assert_called_once_with(
-            ("B1B37", "73A05C0ED0176787A4F1574FF0075F7521E")
+            KNOWN_PASSWORDS["qwerty"]
         )
 
     @patch("builtins.print")
@@ -295,8 +296,8 @@ class TestMain:
         with patch("sys.argv", ["passchek", "-s", "password", "qwerty"]):
             main()
         assert mock_print.call_count == 2
-        mock_print.assert_any_call(("5BAA6", "1E4C9B93F3F0682250B6CF8331B7EE68FD8"))
-        mock_print.assert_any_call(("B1B37", "73A05C0ED0176787A4F1574FF0075F7521E"))
+        mock_print.assert_any_call(KNOWN_PASSWORDS["password"])
+        mock_print.assert_any_call(KNOWN_PASSWORDS["qwerty"])
 
     # -s with --pipe
     @patch("builtins.print")
@@ -316,7 +317,7 @@ class TestMain:
         with patch("sys.argv", ["passchek", "-s"]):
             main()
         mock_print.assert_called_once_with(
-            ("5BAA6", "1E4C9B93F3F0682250B6CF8331B7EE68FD8")
+            KNOWN_PASSWORDS["password"]
         )
 
     # password as argument
@@ -411,6 +412,5 @@ class TestMain:
             patch("sys.stdin", iter([" password \n"])),
         ):
             main()
-        called_prefix = mockreqst.call_args[0][0]
-        expected_prefix, _ = hash_password(" password ")
-        assert called_prefix == expected_prefix
+        called_prefix, _ = hash_password(" password ")
+        mockreqst.assert_called_once_with(called_prefix)
