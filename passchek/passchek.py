@@ -20,7 +20,10 @@ import sys
 import urllib.error
 import urllib.request
 
-__version__ = "0.2.3"
+try:
+    from passchek._version import __version__
+except ImportError:
+    __version__ = "0.2.3"
 
 _API = "https://api.pwnedpasswords.com/range/"
 
