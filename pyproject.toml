@@ -1,29 +1,117 @@
+[build-system]
+requires = ["setuptools>=72", "setuptools-scm>=8"]
+build-backend = "setuptools.backends.legacy:build"
+
+# ---------------------------------------------
+# PROJECT METADATA  (PEP 621)
+# ---------------------------------------------
+[project]
+name = "passchek"
+dynamic = ["version"]
+description = "Simple CLI tool that checks if your password has been compromised."
+readme = { file = "README.md", content-type = "text/markdown" }
+license = { spdx-expression = "MIT" } 
+authors = [
+    { name = "Yevgeny Dyatlov", email = "edyatl@yandex.ru" },
+]
+keywords = [
+    "password", "pwned", "pwnedpassword", "k-anonymity",
+    "sha1", "troyhunt", "cli", "security",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent", 
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+    "Topic :: Utilities",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "requests>=2.31",    # adjust to your actual runtime deps
+]
+
+[project.urls]
+Homepage       = "https://github.com/edyatl/passchek"
+Repository     = "https://github.com/edyatl/passchek"
+"Bug Tracker"  = "https://github.com/edyatl/passchek/issues"
+Changelog      = "https://github.com/edyatl/passchek/releases"
+
+[project.scripts]
+passchek = "passchek.passchek:main"
+
+# ---------------------------------------------
+# OPTIONAL / DEV DEPENDENCIES  (PEP 631)
+# ---------------------------------------------
+[project.optional-dependencies]
+dev = [
+    "build>=1.2",
+    "twine>=5",
+    "setuptools-scm>=8",
+]
+test = [
+    "pytest>=8",
+    "pytest-cov>=5",
+    "responses>=0.25",   # for mocking HTTP calls
+]
+
+# ---------------------------------------------
+# SETUPTOOLS CONFIG
+# ---------------------------------------------
+[tool.setuptools.packages.find]
+where   = ["."]
+include = ["passchek*"]
+exclude = ["tests*", "docs*"]
+
+[tool.setuptools.package-data]
+passchek = ["py.typed"]          # include type marker if you add one
+
+# ---------------------------------------------
+# DYNAMIC VERSIONING via setuptools-scm
+# ---------------------------------------------
+[tool.setuptools_scm]
+# Derives version from git tags (e.g. `git tag v1.2.3`)
+# Writes _version.py so the installed package can read it at runtime
+write_to = "passchek/_version.py"
+version_scheme  = "post-release"
+local_scheme    = "dirty-tag"
+
+# ---------------------------------------------
+# RUFF 
+# ---------------------------------------------
 [tool.ruff]
-line-length = 88          # PEP 8 default
-target-version = "py312" 
+line-length    = 88
+target-version = "py312"
 
 [tool.ruff.lint]
-select = [
-    "E",      # pycodestyle (PEP 8)
-    "F",      # pyflakes
-    "I",      # isort (import sorting)
-    "D",      # pydocstyle (PEP 257 docstrings)
-    "UP",     # pyupgrade (modern Python syntax)
-    "B",      # flake8-bugbear (common bugs)
-    "SIM",    # flake8-simplify (reduce clutter, more readable)
-    "PL",     # pylint compatibility (optional — keeps some of your old pylint strictness)
-    "RUF",    # Ruff-specific rules (extra polish)
-]
-ignore = ["D203", "D213"]  # Common docstring convention tweaks
+select = ["E", "F", "I", "D", "UP", "B", "SIM", "PL", "RUF"]
+ignore = ["D203", "D213"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "pep257"
 
 [tool.ruff.format]
-quote-style = "double" 
+quote-style = "double"
 
+# ---------------------------------------------
+# MYPY
+# ---------------------------------------------
 [tool.mypy]
-python_version = "3.12"
-warn_return_any = true
+python_version      = "3.12"
+warn_return_any     = true
 warn_unused_configs = true
-disallow_untyped_defs = true 
+disallow_untyped_defs = true
+
+# ---------------------------------------------
+# PYTEST
+# ---------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts   = "--cov=passchek --cov-report=term-missing"
