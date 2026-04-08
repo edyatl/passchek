@@ -303,9 +303,10 @@ class TestMain:
     @patch("builtins.print")
     def test_sha1_pipe(self, mock_print: MagicMock) -> None:
         stdin_lines = "password\nqwerty\n"
-        with patch("sys.argv", ["passchek", "-s", "-p"]):
-            with patch("sys.stdin", iter(stdin_lines.splitlines(keepends=True))):
-                main()
+        with patch("sys.argv", ["passchek", "-s", "-p"]), patch(
+            "sys.stdin", iter(stdin_lines.splitlines(keepends=True))
+        ):
+            main()
         assert mock_print.call_count == 2
 
     # -s interactive (no args, no pipe)
@@ -356,18 +357,20 @@ class TestMain:
     @patch("builtins.print")
     def test_pipe_short(self, mock_print: MagicMock, _) -> None:
         stdin_lines = "password\nqwerty\n"
-        with patch("sys.argv", ["passchek", "-p"]):
-            with patch("sys.stdin", iter(stdin_lines.splitlines(keepends=True))):
-                main()
+        with patch("sys.argv", ["passchek", "-p"]), patch(
+            "sys.stdin", iter(stdin_lines.splitlines(keepends=True))
+        ):
+            main()
         assert mock_print.call_count == 2
 
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
     @patch("builtins.print")
     def test_pipe_long(self, mock_print: MagicMock, _) -> None:
         stdin_lines = "password\n"
-        with patch("sys.argv", ["passchek", "--pipe"]):
-            with patch("sys.stdin", iter(stdin_lines.splitlines(keepends=True))):
-                main()
+        with patch("sys.argv", ["passchek", "--pipe"]), patch(
+            "sys.stdin", iter(stdin_lines.splitlines(keepends=True))
+        ):
+            main()
         mock_print.assert_called_once_with(
             "This password has appeared 7 times in data breaches."
         )
@@ -376,9 +379,10 @@ class TestMain:
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
     @patch("builtins.print")
     def test_pipe_and_num_only(self, mock_print: MagicMock, _) -> None:
-        with patch("sys.argv", ["passchek", "-p", "-n"]):
-            with patch("sys.stdin", iter(["password\n"])):
-                main()
+        with patch("sys.argv", ["passchek", "-p", "-n"]), patch(
+            "sys.stdin", iter(["password\n"])
+        ):
+            main()
         mock_print.assert_called_once_with(7)
 
     # interactive prompt (no args, no pipe)
@@ -399,9 +403,10 @@ class TestMain:
     @patch("passchek.passchek.reqst", return_value="")
     @patch("builtins.print")
     def test_pipe_preserves_spaces(self, _, mockreqst: MagicMock) -> None:
-        with patch("sys.argv", ["passchek", "-p"]):
-            with patch("sys.stdin", iter([" password \n"])):
-                main()
+        with patch("sys.argv", ["passchek", "-p"]), patch(
+            "sys.stdin", iter([" password \n"])
+        ):
+            main()
         called_prefix = mockreqst.call_args[0][0]
         expected_prefix, _ = hash_password(" password ")
         assert called_prefix == expected_prefix
