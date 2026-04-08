@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 """
 Module for testing the passchek module.
-
-This module contains tests for the passchek module, covering various scenarios and
-edge cases to ensure the module functions as expected.
 """
 
 import urllib.error
@@ -25,13 +22,9 @@ from passchek.passchek import (
 # hash_password
 # ---------------------------------------------------------------------------
 
-class TestHashPassword:
-    """
-    Class for testing the hash_password function.
 
-    This class contains tests for the hash_password function, covering various
-    scenarios and edge cases to ensure the function functions as expected.
-    """
+class TestHashPassword:
+    """Class for testing the hash_password function."""
 
     def test_known_vectors(self) -> None:
         assert hash_password("qwerty") == (
@@ -71,13 +64,9 @@ class TestHashPassword:
 # reqst
 # ---------------------------------------------------------------------------
 
-class TestReqst:
-    """
-    Class for testing the reqst function.
 
-    This class contains tests for the reqst function, covering various scenarios and
-    edge cases to ensure the function functions as expected.
-    """
+class TestReqst:
+    """Class for testing the reqst function."""
 
     @patch("passchek.passchek.urllib.request.urlopen")
     def test_returns_decoded_body(self, mock_urlopen: MagicMock) -> None:
@@ -157,12 +146,7 @@ MOCK_BODY = (
 
 
 class TestPwnedCount:
-    """
-    Class for testing the pwned_count function.
-
-    This class contains tests for the pwned_count function, covering various
-    scenarios and edge cases to ensure the function functions as expected.
-    """
+    """Class for testing the pwned_count function."""
 
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
     def test_found_returns_count(self, mockreqst: MagicMock) -> None:
@@ -193,13 +177,9 @@ class TestPwnedCount:
 # get_matches
 # ---------------------------------------------------------------------------
 
-class TestReport:
-    """
-    Class for testing the get_matches function.
 
-    This class contains tests for the get_matches function, covering various
-    scenarios and edge cases to ensure the function functions as expected.
-    """
+class TestReport:
+    """Class for testing the get_matches function."""
 
     @patch("passchek.passchek.pwned_count", return_value=5)
     @patch("builtins.print")
@@ -234,13 +214,9 @@ class TestReport:
 # usage
 # ---------------------------------------------------------------------------
 
-class TestUsage:
-    """
-    Class for testing the usage function.
 
-    This class contains tests for the usage function, covering various scenarios
-    and edge cases to ensure the function functions as expected.
-    """
+class TestUsage:
+    """Class for testing the usage function."""
 
     @patch("builtins.print")
     def test_contains_version(self, mock_print: MagicMock) -> None:
@@ -260,13 +236,9 @@ class TestUsage:
 # main — option parsing
 # ---------------------------------------------------------------------------
 
-class TestMain:
-    """
-    Class for testing the main function.
 
-    This class contains tests for the main function, covering various scenarios
-    and edge cases to ensure the function functions as expected.
-    """
+class TestMain:
+    """Class for testing the main function."""
 
     # -h / --help
     @patch("builtins.print")
