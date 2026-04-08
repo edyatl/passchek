@@ -32,6 +32,8 @@ MOCK_BODY = (
     "011053FD0102E94D6AE2F8B83D76FAF94F6:1\r\n"
 )
 
+NUMBER = {2: 2, 5: 5, 7: 7, 35: 35}
+
 # ---------------------------------------------------------------------------
 # hash_password
 # ---------------------------------------------------------------------------
@@ -46,8 +48,8 @@ class TestHashPassword:
 
     def test_empty_string(self) -> None:
         prefix, suffix = hash_password("")
-        assert len(prefix) == 5
-        assert len(suffix) == 35
+        assert len(prefix) == NUMBER[5]
+        assert len(suffix) == NUMBER[35]
         assert (prefix + suffix) == "DA39A3EE5E6B4B0D3255BFEF95601890AFD80709"
 
     def test_returns_uppercase(self) -> None:
@@ -58,13 +60,13 @@ class TestHashPassword:
     def test_prefix_always_five_chars(self) -> None:
         for pw in ("a", "abc", "correct horse battery staple", "🔑"):
             prefix, suffix = hash_password(pw)
-            assert len(prefix) == 5
-            assert len(suffix) == 35
+            assert len(prefix) == NUMBER[5]
+            assert len(suffix) == NUMBER[35]
 
     def test_unicode_password(self) -> None:
         prefix, suffix = hash_password("pässwörд")
-        assert len(prefix) == 5
-        assert len(suffix) == 35
+        assert len(prefix) == NUMBER[5]
+        assert len(suffix) == NUMBER[35]
 
 
 # ---------------------------------------------------------------------------
@@ -146,12 +148,13 @@ class TestReqst:
 # pwned_count
 # ---------------------------------------------------------------------------
 
+
 class TestPwnedCount:
     """Class for testing the pwned_count function."""
 
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
     def test_found_returns_count(self, mockreqst: MagicMock) -> None:
-        assert pwned_count("password") == 7
+        assert pwned_count("password") == NUMBER[7]
         mockreqst.assert_called_once_with("5BAA6")
 
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
@@ -279,23 +282,19 @@ class TestMain:
     def test_sha1_with_arg(self, mock_print: MagicMock) -> None:
         with patch("sys.argv", ["passchek", "-s", "password"]):
             main()
-        mock_print.assert_called_once_with(
-            KNOWN_PASSWORDS["password"]
-        )
+        mock_print.assert_called_once_with(KNOWN_PASSWORDS["password"])
 
     @patch("builtins.print")
     def test_sha1_long_with_arg(self, mock_print: MagicMock) -> None:
         with patch("sys.argv", ["passchek", "--sha1", "qwerty"]):
             main()
-        mock_print.assert_called_once_with(
-            KNOWN_PASSWORDS["qwerty"]
-        )
+        mock_print.assert_called_once_with(KNOWN_PASSWORDS["qwerty"])
 
     @patch("builtins.print")
     def test_sha1_multiple_args(self, mock_print: MagicMock) -> None:
         with patch("sys.argv", ["passchek", "-s", "password", "qwerty"]):
             main()
-        assert mock_print.call_count == 2
+        assert mock_print.call_count == NUMBER[2]
         mock_print.assert_any_call(KNOWN_PASSWORDS["password"])
         mock_print.assert_any_call(KNOWN_PASSWORDS["qwerty"])
 
@@ -308,7 +307,7 @@ class TestMain:
             patch("sys.stdin", iter(stdin_lines.splitlines(keepends=True))),
         ):
             main()
-        assert mock_print.call_count == 2
+        assert mock_print.call_count == NUMBER[2]
 
     # -s interactive (no args, no pipe)
     @patch("passchek.passchek.getpass.getpass", return_value="password")
@@ -316,9 +315,7 @@ class TestMain:
     def test_sha1_interactive(self, mock_print: MagicMock, _) -> None:
         with patch("sys.argv", ["passchek", "-s"]):
             main()
-        mock_print.assert_called_once_with(
-            KNOWN_PASSWORDS["password"]
-        )
+        mock_print.assert_called_once_with(KNOWN_PASSWORDS["password"])
 
     # password as argument
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
@@ -336,7 +333,7 @@ class TestMain:
     def test_multiple_password_args(self, mock_print: MagicMock, _) -> None:
         with patch("sys.argv", ["passchek", "password", "qwerty"]):
             main()
-        assert mock_print.call_count == 2
+        assert mock_print.call_count == NUMBER[2]
 
     # -n / --num-only with argument
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
@@ -363,7 +360,7 @@ class TestMain:
             patch("sys.stdin", iter(stdin_lines.splitlines(keepends=True))),
         ):
             main()
-        assert mock_print.call_count == 2
+        assert mock_print.call_count == NUMBER[2]
 
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
     @patch("builtins.print")
