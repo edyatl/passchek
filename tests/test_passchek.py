@@ -270,9 +270,8 @@ class TestMain:
 
     # unknown option
     def test_unknown_option_exits(self) -> None:
-        with patch("sys.argv", ["passchek", "--unknown"]):
-            with pytest.raises(SystemExit):
-                main()
+        with patch("sys.argv", ["passchek", "--unknown"]), pytest.raises(SystemExit):
+            main()
 
     # -s / --sha1 with argument
     @patch("builtins.print")
@@ -303,8 +302,9 @@ class TestMain:
     @patch("builtins.print")
     def test_sha1_pipe(self, mock_print: MagicMock) -> None:
         stdin_lines = "password\nqwerty\n"
-        with patch("sys.argv", ["passchek", "-s", "-p"]), patch(
-            "sys.stdin", iter(stdin_lines.splitlines(keepends=True))
+        with (
+            patch("sys.argv", ["passchek", "-s", "-p"]),
+            patch("sys.stdin", iter(stdin_lines.splitlines(keepends=True))),
         ):
             main()
         assert mock_print.call_count == 2
@@ -357,8 +357,9 @@ class TestMain:
     @patch("builtins.print")
     def test_pipe_short(self, mock_print: MagicMock, _) -> None:
         stdin_lines = "password\nqwerty\n"
-        with patch("sys.argv", ["passchek", "-p"]), patch(
-            "sys.stdin", iter(stdin_lines.splitlines(keepends=True))
+        with (
+            patch("sys.argv", ["passchek", "-p"]),
+            patch("sys.stdin", iter(stdin_lines.splitlines(keepends=True))),
         ):
             main()
         assert mock_print.call_count == 2
@@ -367,8 +368,9 @@ class TestMain:
     @patch("builtins.print")
     def test_pipe_long(self, mock_print: MagicMock, _) -> None:
         stdin_lines = "password\n"
-        with patch("sys.argv", ["passchek", "--pipe"]), patch(
-            "sys.stdin", iter(stdin_lines.splitlines(keepends=True))
+        with (
+            patch("sys.argv", ["passchek", "--pipe"]),
+            patch("sys.stdin", iter(stdin_lines.splitlines(keepends=True))),
         ):
             main()
         mock_print.assert_called_once_with(
@@ -379,8 +381,9 @@ class TestMain:
     @patch("passchek.passchek.reqst", return_value=MOCK_BODY)
     @patch("builtins.print")
     def test_pipe_and_num_only(self, mock_print: MagicMock, _) -> None:
-        with patch("sys.argv", ["passchek", "-p", "-n"]), patch(
-            "sys.stdin", iter(["password\n"])
+        with (
+            patch("sys.argv", ["passchek", "-p", "-n"]),
+            patch("sys.stdin", iter(["password\n"])),
         ):
             main()
         mock_print.assert_called_once_with(7)
@@ -403,8 +406,9 @@ class TestMain:
     @patch("passchek.passchek.reqst", return_value="")
     @patch("builtins.print")
     def test_pipe_preserves_spaces(self, _, mockreqst: MagicMock) -> None:
-        with patch("sys.argv", ["passchek", "-p"]), patch(
-            "sys.stdin", iter([" password \n"])
+        with (
+            patch("sys.argv", ["passchek", "-p"]),
+            patch("sys.stdin", iter([" password \n"])),
         ):
             main()
         called_prefix = mockreqst.call_args[0][0]
