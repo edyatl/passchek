@@ -33,6 +33,7 @@ lib64
 files/
 *.mp3
 **/*.mp3
+_version.py
 
 # Installer logs
 pip-log.txt
