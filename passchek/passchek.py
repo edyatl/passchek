@@ -160,29 +160,20 @@ def main() -> None:
     if exit_after_parse:
         return
 
-    if sha1_output:
+    def _passwords() -> list[str]:
         if args:
-            for pw in args:
-                result = hash_password(pw)
-                print(result if text_output else " ".join(result))
-        elif use_in_pipe:
-            for line in sys.stdin:
-                result = hash_password(line.strip())
-                print(result if text_output else " ".join(result))
-        else:
-            pw = getpass.getpass("Enter password: ")
-            result = hash_password(pw)
-            print(result if text_output else " ".join(result))
+            return args
+        if use_in_pipe:
+            return [ln.rstrip("\n") for ln in sys.stdin]
+        return [getpass.getpass("Enter password: ")]
+
+    if sha1_output:
+        for pw in _passwords():
+            print(hash_password(pw) if text_output else " ".join(hash_password(pw)))
         return
 
-    if args:
-        for pw in args:
-            get_matches(text_output, pw)
-    elif use_in_pipe:
-        for line in sys.stdin:
-            get_matches(text_output, line.strip())
-    else:
-        get_matches(text_output)
+    for pw in _passwords():
+        get_matches(text_output, pw)
 
 
 if __name__ == "__main__":
