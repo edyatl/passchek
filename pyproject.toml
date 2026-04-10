@@ -1,6 +1,6 @@
 [build-system]
 requires = ["setuptools>=72", "setuptools-scm>=8"]
-build-backend = "setuptools.backends.legacy:build"
+build-backend = "setuptools.build_meta"
 
 # ---------------------------------------------
 # PROJECT METADATA  (PEP 621)
