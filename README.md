@@ -1,241 +1,301 @@
-![Passchek logo](https://svgshare.com/i/Mmo.svg)
-
+![Passchek logo](./passchek_logo.svg)
 
 # Passchek
 
+> A privacy-first CLI tool for checking whether a password has appeared in known data breaches using Troy Hunt's Pwned Passwords API and the k-anonymity model.
 
-> Passchek is a simple cli tool, checks if your password has been compromised.
+[![Version](https://img.shields.io/badge/version-v0.2.3-blue)](https://github.com/edyatl/passchek)
+[![Python](https://img.shields.io/badge/python-3.9%20--%203.14-blue)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-[![Version: v0.2.1](https://img.shields.io/badge/version-v0.2.1-blue)](https://github.com/edyatl/passchek)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/edyatl/passchek/LICENSE)
-[![Python3](https://img.shields.io/badge/python-3.5%20%7C%203.6%20%7C%203.7-blue)](https://github.com/edyatl/passchek)
+Passchek securely checks passwords against the [Have I Been Pwned Pwned Passwords API](https://haveibeenpwned.com/API/v3#SearchingPwnedPasswordsByRange) without ever sending the full password, or even the full SHA-1 hash, over the network.
 
-Passchek is a python program for searching in [Troy Hunt's pwnedpassword API](https://haveibeenpwned.com/API/v3#SearchingPwnedPasswordsByRange) using the k-anonymity algorithm.
+The project is intentionally designed so that users can quickly audit the full source code themselves. Since real passwords and user trust are involved, the implementation follows strict engineering principles:
 
-Passchek was inspired by [jamesridgway](https://github.com/jamesridgway)/[pwnedpasswords.sh](https://github.com/jamesridgway/pwnedpasswords.sh) bash script.
+## Design Principles
 
+1. **Conciseness**
+   The code stays as short as possible while preserving readability. No unnecessary layers, abstractions, or dead code.
 
-## Algorithm
+2. **Clarity**
+   A novice Python developer should be able to understand the whole program in under a minute. The structure is intentionally simple, PEP 8 compliant, and self-explanatory.
 
+3. **Leanness**
+   Every function, import, and constant must justify its existence. Anything non-essential is removed.
 
-1. Hash the PASSWORD by SHA1.
-2. Split hash for 5 char prefix and 35 char suffix.
-3. Requests [Troy Hunt's pwnedpassword API](https://haveibeenpwned.com/API/v3#SearchingPwnedPasswordsByRange) for the prefix.
-4. Convert response to the dictionary with suffixes as keys and number of matches as values.
-5. And finally determine matches for initial PASSWORD by its hash suffix as a key.
+4. **Embeddability**
+   The core breach-check logic is trivially reusable as a small importable function for CI/CD, scripts, web backends, or other automation.
 
+5. **Professional suitability**
+   The codebase follows production-grade engineering expectations: clear control flow, minimal side effects, strong typing, predictable behavior, robust error handling, and idiomatic Python.
+
+6. **Security**
+   Password exposure risk is minimized through hidden prompt input, reduced plaintext copies, no logging, no unnecessary I/O, local suffix matching, and careful hashing flow.
+
+7. **Independence**
+   Passchek uses only the Python standard library and targets Python 3.9+.
+
+8. **Speed**
+   Response parsing uses early exits, minimal allocations, efficient iteration, and reduced memory copies for the fastest possible standard-library implementation.
+
+These principles make it easy for users to personally verify that the application behaves safely.
+
+---
 
 ## Features
 
+* Secure password breach checks using the k-anonymity protocol
+* Check single or multiple passwords
+* Read passwords from stdin and shell pipes
+* Numeric-only output for scripting
+* SHA-1 prefix/suffix output without network access
+* Fast early-exit response parsing
+* Python 3.9 through 3.14 support
+* Modern PyPI package installation
+* Zero third-party runtime dependencies
 
-- Checks one password or number of passwords.
-- Shows a text sentence about  compromising or just figures.
-- It can be used in shell pipes, it can read stdin.
-- It can display the SHA1 password hash in a tuple format (“prefix”, “suffix”) without an Internet request.
+---
 
+## How It Works
 
-## Usage
+1. Hash the password with SHA-1
+2. Split the hash into:
 
+   * first 5 characters as prefix
+   * remaining 35 characters as suffix
+3. Send only the prefix to the API
+4. Compare suffixes locally
+5. Return the breach count
 
-```sh
-    Usage:
-        passchek.py [options] [<PASSWORD>]
+The full password never leaves the local machine.
 
-    Arguments:
-        PASSWORD Provide (password | passwords) as argument or leave blank to provide via stdin or prompt
-
-    Options:
-        -h, --help      Shows this help message and exit
-        -n, --num-only  Set output without accompanying text
-        -p, --pipe      For use in shell pipes, read stdin
-        -s, --sha1      Shows SHA1 hash in tuple ("prefix", "suffix") and exit
-        -v, --version   Shows current version of the program and exit
-```
-
-### Security Note
-
-
-Please note that in case of using PASSWORD as command line argument it will be kept in .bash_history file in raw insecure format. Using via explicit prompt dialog is more secure and preferably.
-
-
-## Usage examples
-
-
-A) Call **passchek** without options and arguments, enter 'qwerty' as an example password. *Please note that when you are typing password via explicit prompt, nothing is displayed on the screen, this is normal and is used for security reasons.* After press Enter key you'll see a sentence in new line with number of matches in the pwnedpassword DB.
-
-```sh
-    $ python3 passchek.py 
-    Enter password: 
-    This password has appeared 3912816 times in data breaches.
-```
-
-B) Call **passchek** with option '-n' (--num-only) without arguments, enter 'qwerty' as an example password. After press Enter key you'll see a number in new line with matches in the pwnedpassword DB.
-
-```sh
-    $ python3 passchek.py -n 
-    Enter password: 
-    3912816
-```
-
-C) Call **passchek** with option '-s' (--sha1) without arguments, enter 'qwerty' as an example password. After press Enter key you'll see new line with the password hash in a tuple format (“prefix”, “suffix”).
-
-```sh
-    $ python3 passchek.py -s
-    Enter password: 
-    ('B1B37', '73A05C0ED0176787A4F1574FF0075F7521E')
-```
-
-D) Call **passchek** with options '-ns' (--num-only --sha1) without arguments, enter 'qwerty' as an example password. After press Enter key you'll see new line with the password hash splited by space 'prefix suffix'.
-
-```sh
-    $ python3 passchek.py -ns
-    Enter password: 
-    B1B37 73A05C0ED0176787A4F1574FF0075F7521E
-```
-
-E) Call **passchek** without options and with argument 'qwerty' as an example password. You'll see a sentence in new line with number of matches in the pwnedpassword DB. *Please note that using real password as an argument not recommended, for more details see [Security Note](#security-note).*
-
-```sh
-    $ python3 passchek.py qwerty
-    This password has appeared 3912816 times in data breaches.
-```
-
-F) Call **passchek** with option '-n' (--num-only) and with arguments 'qwerty', 'ytrewq', 'qazwsx' *(these three are very common weak passwords)* and 'jnfjdfksdjfbskjdeuhiseg' *(random typing)* as examples passwords. You'll see numbers in new lines with matches in the pwnedpassword DB. *Please don't forget about [Security Note](#security-note).*
-
-```sh
-    $ python3 passchek.py -n qwerty ytrewq qazwsx jnfjdfksdjfbskjdeuhiseg
-    3912816
-    33338
-    505344
-    0
-```
-
-G) Use **passchek** with options '-np' (--num-only --pipe) in pipe with `cat pass_list.txt` to check all passwords in text file (In this example text file was created as `ls .. > pass_list.txt` in the script dir). You'll see numbers in new lines with matches in the pwnedpassword DB.
-
-```sh
-    $ cat pass_list.txt | python3 passchek.py -np
-    21
-    8
-    0
-    0
-    0
-    0
-    0
-    0
-    457
-```
-
-H) Let's count a number of compromised passwords in the previous example 'G'. 
-
-```sh
-    $ cat pass_list.txt | python3 passchek.py -np | grep -v '^0' | wc -l
-    3
-```
-So three passwords in our list have been compromised.
-
-I) To determine these three weak passwords we need to know their line numbers in the text file.
-
-```sh
-    $ cat pass_list.txt | python3 passchek.py -np | grep -vn '^0'
-    1:21
-    2:8
-    9:457
-```
-
-J) Now we can get a list of strong passwords just delete lines with compromised.
-
-```sh
-    $ sed -i '1d;2d;9d;' pass_list.txt | python3 passchek.py -np | grep -v '^0' | wc -l
-    0
-```
-So no more weak passwords detected.
-
+---
 
 ## Installation
 
+### From PyPI
 
-You can simple download one script file [passchek.py](https://github.com/edyatl/passchek/blob/master/passchek/passchek.py) and use it with python3.
-
-Or try to install by pip.
-
-First check if package exists:
-
-```sh
-    $ python3 -m pip search passchek
-```
-Install if package exists:
-
-```sh
-    $ python3 -m pip install --user passchek
-```
-Or just:
-```sh
-    $ pip3 install passchek
+```bash
+python3 -m pip install --upgrade passchek
 ```
 
+Or for the current user only:
 
-### Installation for Windows users
-
-
-If you are want to use Passchek on Windows, first install Python 3 from https://www.python.org/downloads/windows/.
-
-While installation check at setup master  something like `Also install pip` to install package manager pip with Python 3:
-
-* [x] Also install pip version ...
-
-After Python 3 installation process type cmd.exe in run menu and press Enter to open console window.
-
-Then type in console window:
-```sh
-    C:\Users\User> pip install passchek
+```bash
+python3 -m pip install --user passchek
 ```
 
-Try **passchek**, enter 'qwerty' as an example password. *Please note that when you are typing password via explicit prompt, nothing is displayed on the screen, this is normal and is used for security reasons.* 
+### Verify installation
 
-```sh
-    C:\Users\User> passchek 
-    Enter password: 
-    This password has appeared 3912816 times in data breaches.
+```bash
+passchek --version
 ```
 
+Expected output:
 
-## Help
+```bash
+Passchek v0.2.3
+```
 
+### From source
 
-For help screen just provide `-h` or `--help` as a command line option.
+```bash
+git clone https://github.com/edyatl/passchek.git
+cd passchek
+python3 -m pip install .
+```
 
-Option `-v` or `--version` shows current version.
+Note: `pip search` is no longer supported by PyPI. Use `pip show passchek` or `passchek --version` instead.
 
+---
+
+## Usage
+
+```text
+Usage:
+    passchek [options] [PASSWORD ...]
+
+Arguments:
+    PASSWORD    One or more passwords to check.
+                If omitted, Passchek reads from prompt or stdin.
+
+Options:
+    -h, --help       Show help and exit
+    -n, --num-only   Output only breach count numbers
+    -p, --pipe       Read passwords from stdin / shell pipe
+    -s, --sha1       Print SHA-1 hash as prefix/suffix and exit
+    -v, --version    Show Passchek version
+```
+
+---
+
+## Examples
+
+### Interactive prompt
+
+```bash
+$ passchek
+Enter password:
+This password has appeared 3912816 times in data breaches.
+```
+
+### Numeric output only
+
+```bash
+$ passchek -n
+Enter password:
+3912816
+```
+
+### SHA-1 tuple mode
+
+```bash
+$ passchek -s
+Enter password:
+('B1B37', '73A05C0ED0176787A4F1574FF0075F7521E')
+```
+
+### Multiple passwords
+
+```bash
+$ passchek -n qwerty ytrewq qazwsx random_password
+3912816
+33338
+505344
+0
+```
+
+### Pipe mode
+
+```bash
+$ cat passwords.txt | passchek -np
+21
+8
+0
+0
+457
+```
+
+---
+
+## Security Notes
+
+The safest way to use Passchek is interactive prompt mode:
+
+```bash
+passchek
+```
+
+This avoids shell history leakage and keeps input hidden.
+
+Avoid passing real passwords as command-line arguments:
+
+```bash
+passchek my-secret-password
+```
+
+Shell history may store plaintext values.
+
+Prefer:
+
+* interactive prompt
+* stdin pipe
+* secret injection from secure automation environments
+
+---
+
+## Windows
+
+Install Python 3.9+ from:
+
+[https://www.python.org/downloads/windows/](https://www.python.org/downloads/windows/)
+
+Then install:
+
+```powershell
+py -m pip install passchek
+```
+
+Run:
+
+```powershell
+passchek
+```
+
+---
+
+## Changelog
+
+## v0.2.3 (2026-04-10)
+
+A major refactoring and modernization release focused on maintainability, packaging, typing, and Python 3.14 readiness.
+
+### Added
+
+* Python 3.9+ built-in generics support
+* package-style versioning via `passchek._version.__version__`
+* improved MANIFEST and PyPI packaging flow
+* better CLI version and help formatting
+* comprehensive type hints in source and tests
+* linter, formatter, and pre-commit configuration
+
+### Changed
+
+* refactored `main()` into smaller focused units
+* replaced legacy URL helpers with `_API` constant and f-strings
+* optimized response parsing with `splitlines()` and `partition()`
+* early exit on first suffix match
+* modernized packaging from `setup.py` to `pyproject.toml`
+* improved SHA-1 handling with `usedforsecurity=True`
+
+### Fixed
+
+* corrected password whitespace stripping
+* improved pipe newline handling
+* better empty-password test behavior
+* more robust urllib error handling
+* consistent non-zero CLI exit codes
+
+---
 
 ## Contributing
 
+Contributions are welcome.
 
-The main repository if the code is at https://github.com/edyatl/passchek
+Areas especially appreciated:
 
-I'm happy to take from you any patches, pull requests,  bug reports,  ideas about new functionality and so on.
+* security review
+* performance review
+* code simplification
+* packaging improvements
+* test coverage
 
-If you find this project useful, don't forget to give it a star ⭐️ on Github  to show your support!
+Repository:
 
+[https://github.com/edyatl/passchek](https://github.com/edyatl/passchek)
 
-## Thanks
+---
 
+## Acknowledgements
 
-Thanks to [Troy Hunt](https://www.troyhunt.com) for collecting data and providing API.
+Thanks to [Troy Hunt](https://www.troyhunt.com) for the Pwned Passwords API.
 
-Thanks to [James Ridgway](https://github.com/jamesridgway) for [pwnedpasswords.sh](https://github.com/jamesridgway/pwnedpasswords.sh) bash script.
+Thanks to [James Ridgway](https://github.com/jamesridgway) for the original shell-script inspiration.
 
+---
 
-## Authors
+## Author
 
+**Yevgeny Dyatlov**
 
-Yevgeny Dyatlov ([@edyatl](https://github.com/edyatl))
+GitHub: [https://github.com/edyatl](https://github.com/edyatl)
 
+---
 
 ## License
 
+MIT License
 
-This project is licensed under the MIT License.
+Copyright (c) 2020-2026 Yevgeny Dyatlov
 
-Copyright (c) 2020 Yevgeny Dyatlov ([@edyatl](https://github.com/edyatl))
-
-Please see the [LICENSE](https://github.com/edyatl/passchek/blob/master/LICENSE) file for details.
+See [LICENSE](LICENSE) for details.
