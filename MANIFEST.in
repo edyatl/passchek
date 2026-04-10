@@ -3,4 +3,6 @@ include LICENSE
 recursive-include passchek *.py *.pyi py.typed
 prune tests
 prune docs
+prune *.png
+prune *.svg
 prune .github
