@@ -1,5 +1,3 @@
-![Passchek logo](./passchek_logo.svg)
-
 # Passchek
 
 > A privacy-first CLI tool for checking whether a password has appeared in known data breaches using Troy Hunt's Pwned Passwords API and the k-anonymity model.
