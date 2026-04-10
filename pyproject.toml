@@ -10,7 +10,7 @@ name = "passchek"
 dynamic = ["version"]
 description = "Simple CLI tool that checks if your password has been compromised."
 readme = { file = "README.md", content-type = "text/markdown" }
-license = { spdx-expression = "MIT" } 
+license = { file = "LICENSE" } 
 authors = [
     { name = "Yevgeny Dyatlov", email = "edyatl@yandex.ru" },
 ]
